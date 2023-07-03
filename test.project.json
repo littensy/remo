@@ -1,0 +1,30 @@
+{
+	"name": "remo",
+	"tree": {
+		"$className": "DataModel",
+		"StarterPlayer": {
+			"$className": "StarterPlayer"
+		},
+		"ReplicatedStorage": {
+			"$className": "ReplicatedStorage",
+			"Packages": {
+				"$path": "Packages",
+				"Remo": {
+					"$path": "src"
+				}
+			},
+			"DevPackages": {
+				"$path": "DevPackages"
+			}
+		},
+		"TestService": {
+			"$properties": {
+				"ExecuteWithStudioRun": true
+			},
+			"$className": "TestService",
+			"Test": {
+				"$path": "test"
+			}
+		}
+	}
+}

@@ -1,0 +1,39 @@
+{
+	"name": "@rbxts/remo",
+	"version": "0.1.0",
+	"description": "A remote event wrapper for Roblox",
+	"main": "src/init.lua",
+	"scripts": {},
+	"keywords": [],
+	"author": "littensy",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/littensy/remo.git"
+	},
+	"bugs": {
+		"url": "https://github.com/littensy/remo/issues"
+	},
+	"types": "src/index.d.ts",
+	"files": [
+		"src",
+		"!**/*.tsbuildinfo",
+		"!**/*.spec.lua"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"devDependencies": {
+		"@rbxts/compiler-types": "2.1.0-types.1",
+		"@rbxts/types": "^1.0.701",
+		"@typescript-eslint/eslint-plugin": "^5.60.1",
+		"@typescript-eslint/parser": "^5.60.1",
+		"eslint": "^8.43.0",
+		"eslint-config-prettier": "^8.8.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-roblox-ts": "^0.0.35",
+		"prettier": "^2.8.8",
+		"roblox-ts": "^2.1.0",
+		"typescript": "^5.1.6"
+	}
+}
