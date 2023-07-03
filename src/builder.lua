@@ -7,7 +7,10 @@ local function remote(...: types.Validator): types.RemoteBuilder
 		middleware = {},
 	}
 
-	local builder = { metadata = metadata }
+	local builder = {
+		type = "remote",
+		metadata = metadata,
+	} :: types.RemoteBuilder
 
 	function builder.returns(validator: types.Validator): types.RemoteBuilder
 		metadata.returns = validator
@@ -24,4 +27,14 @@ local function remote(...: types.Validator): types.RemoteBuilder
 	return builder
 end
 
-return remote
+local function namespace(remotes: types.RemoteBuilders): types.RemoteNamespace
+	return {
+		type = "namespace",
+		remotes = remotes,
+	}
+end
+
+return {
+	remote = remote,
+	namespace = namespace,
+}

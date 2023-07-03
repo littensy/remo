@@ -17,6 +17,7 @@ export type MiddlewareContext = {
 }
 
 export type RemoteBuilder = {
+	type: "remote",
 	metadata: RemoteBuilderMetadata,
 	returns: (...any) -> RemoteBuilder,
 	middleware: (...Middleware) -> RemoteBuilder,
@@ -28,8 +29,13 @@ export type RemoteBuilderMetadata = {
 	middleware: { Middleware },
 }
 
+export type RemoteNamespace = {
+	type: "namespace",
+	remotes: RemoteBuilders,
+}
+
 export type RemoteBuilders = {
-	[string]: RemoteBuilder,
+	[string]: RemoteBuilder | RemoteNamespace,
 }
 
 export type AnyRemote = ClientEvent | ClientFunction | ServerEvent | ServerFunction
@@ -65,17 +71,18 @@ export type ClientFunction<Value = any, Args... = ...any> = {
 	destroy: (self: ClientFunction<Value, Args...>) -> (),
 }
 
-export type Remotes = {
-	client: ClientRemotes,
-	server: ServerRemotes,
+export type Remotes<Client = ClientRemotes, Server = ServerRemotes> = {
+	client: Client,
+	server: Server,
+	destroy: (self: Remotes<Client, Server>) -> (),
 }
 
 export type ClientRemotes = {
-	[string]: ClientEvent | ClientFunction,
+	[string]: ClientEvent | ClientFunction | ClientRemotes,
 }
 
 export type ServerRemotes = {
-	[string]: ServerEvent | ServerFunction,
+	[string]: ServerEvent | ServerFunction | ServerRemotes,
 }
 
 return nil

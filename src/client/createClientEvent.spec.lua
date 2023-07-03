@@ -2,14 +2,14 @@ return function()
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 	local t = require(ReplicatedStorage.DevPackages.t)
-	local remote = require(script.Parent.Parent.remote)
+	local builder = require(script.Parent.Parent.builder)
 	local mockRemotes = require(script.Parent.Parent.utils.mockRemotes)
 	local createClientEvent = require(script.Parent.createClientEvent)
 
 	local clientEvent, instance
 
 	beforeEach(function()
-		clientEvent = createClientEvent("test", remote(t.string, t.number))
+		clientEvent = createClientEvent("test", builder.remote(t.string, t.number))
 		instance = mockRemotes.createMockRemoteEvent("test")
 	end)
 
@@ -93,7 +93,7 @@ return function()
 
 		clientEvent = createClientEvent(
 			"test",
-			remote(t.string, t.number).middleware(function(next, clientEvent)
+			builder.remote(t.string, t.number).middleware(function(next, clientEvent)
 				middlewareClientEvent = clientEvent
 				return function(...)
 					return next("intercepted", 2)

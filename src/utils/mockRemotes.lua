@@ -100,6 +100,14 @@ local function createMockRemoteFunction(name: string): RemoteFunction
 	return remoteFunction
 end
 
+local function getMockRemoteEvent(name: string): RemoteEvent?
+	return mockRemoteEvents[name]
+end
+
+local function getMockRemoteFunction(name: string): RemoteFunction?
+	return mockRemoteFunctions[name]
+end
+
 local function destroyAll()
 	table.clear(mockRemoteEvents)
 	table.clear(mockRemoteFunctions)
@@ -108,5 +116,7 @@ end
 return {
 	createMockRemoteEvent = createMockRemoteEvent,
 	createMockRemoteFunction = createMockRemoteFunction,
+	getMockRemoteEvent = getMockRemoteEvent,
+	getMockRemoteFunction = getMockRemoteFunction,
 	destroyAll = destroyAll,
 }

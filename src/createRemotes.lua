@@ -9,13 +9,34 @@ local locked: {} = setmetatable({}, {
 	end,
 }) :: any
 
-local function createRemotes(builders: types.RemoteBuilders): types.Remotes
+local function createRemotes<Client, Server>(builders: types.RemoteBuilders): types.Remotes<Client, Server>
 	local isClient = constants.IS_CLIENT or constants.IS_TEST
 	local isServer = constants.IS_SERVER or constants.IS_TEST
 
+	local client = if isClient then client.createClientRemotes(builders) else locked
+	local server = if isServer then server.createServerRemotes(builders) else locked
+
+	local function cleanup(remotes)
+		for _, remote in remotes do
+			if type(remote) ~= "table" then
+				continue
+			end
+
+			if remote.destroy then
+				remote:destroy()
+			else
+				cleanup(remote)
+			end
+		end
+	end
+
 	return {
-		client = if isClient then client.createClientRemotes(builders) else locked,
-		server = if isServer then server.createServerRemotes(builders) else locked,
+		client = (client :: any) :: Client,
+		server = (server :: any) :: Server,
+		destroy = function(self)
+			cleanup(self.client)
+			cleanup(self.server)
+		end,
 	}
 end
 
