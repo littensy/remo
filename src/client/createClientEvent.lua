@@ -29,6 +29,7 @@ local function createClientEvent(name: string, builder: types.RemoteBuilder): ty
 
 	local clientEvent: types.ClientEvent = {
 		name = name,
+		type = "event",
 
 		connect = function(self, callback)
 			assert(connected, `Cannot connect to destroyed event '{name}'`)

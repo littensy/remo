@@ -35,6 +35,7 @@ local function createServerFunction(name: string, builder: types.RemoteBuilder):
 
 	local serverFunction: types.ServerFunction = {
 		name = name,
+		type = "function",
 
 		onInvoke = function(self, callback)
 			assert(connected, `Cannot set handler for destroyed remote function '{name}'`)

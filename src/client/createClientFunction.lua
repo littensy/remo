@@ -32,6 +32,7 @@ local function createClientFunction(name: string, builder: types.RemoteBuilder):
 
 	local clientFunction: types.ClientFunction = {
 		name = name,
+		type = "function",
 
 		onInvoke = function(self, callback)
 			assert(connected, `Cannot connect to destroyed function '{name}'`)

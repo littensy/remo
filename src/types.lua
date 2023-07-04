@@ -47,6 +47,7 @@ export type AnyRemote = ClientEvent | ClientFunction | ServerEvent | ServerFunct
 
 export type ServerEvent<Args... = ...any> = {
 	name: string,
+	type: "event",
 	connect: (self: ServerEvent<Args...>, callback: (Args...) -> ()) -> Cleanup,
 	fire: (self: ServerEvent<Args...>, player: Player, Args...) -> (),
 	fireExcept: (self: ServerEvent<Args...>, player: Player, Args...) -> (),
@@ -57,6 +58,7 @@ export type ServerEvent<Args... = ...any> = {
 
 export type ClientEvent<Args... = ...any> = {
 	name: string,
+	type: "event",
 	connect: (self: ClientEvent<Args...>, callback: (Args...) -> ()) -> Cleanup,
 	fire: (self: ClientEvent<Args...>, Args...) -> (),
 	destroy: (self: ClientEvent<Args...>) -> (),
@@ -64,6 +66,7 @@ export type ClientEvent<Args... = ...any> = {
 
 export type ServerFunction<Returns = any, Args... = ...any> = {
 	name: string,
+	type: "function",
 	onInvoke: (
 		self: ServerFunction<Returns, Args...>,
 		callback: (player: Player, Args...) -> Returns | Thenable<Returns>
@@ -74,6 +77,7 @@ export type ServerFunction<Returns = any, Args... = ...any> = {
 
 export type ClientFunction<Returns = any, Args... = ...any> = {
 	name: string,
+	type: "function",
 	onInvoke: (self: ClientFunction<Returns, Args...>, callback: (Args...) -> Returns | Thenable<Returns>) -> (),
 	invoke: (self: ClientFunction<Returns, Args...>, Args...) -> Thenable<Returns>,
 	destroy: (self: ClientFunction<Returns, Args...>) -> (),
