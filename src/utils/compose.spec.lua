@@ -7,16 +7,16 @@ return function()
 
 		local middleware: types.Middleware = function(next)
 			return function(...)
-				return next(...)
+				return next(...) + 1
 			end
 		end
 
 		local composed = compose({ middleware, middleware, middleware })(function(...): ()
 			a, b, c = ...
-			return 123
+			return 0
 		end, {} :: never)
 
-		expect(composed("foo", "bar", "baz")).to.equal(123)
+		expect(composed("foo", "bar", "baz")).to.equal(3)
 		expect(a).to.equal("foo")
 		expect(b).to.equal("bar")
 		expect(c).to.equal("baz")
@@ -72,5 +72,42 @@ return function()
 		expect(a).to.equal("foo")
 		expect(b).to.equal("bar")
 		expect(c).to.equal("baz")
+	end)
+
+	it("should pass the correct arguments", function()
+		local args1, args2, args3 = {}, {}, {}
+
+		local middleware1: types.Middleware = function(next)
+			return function(...)
+				args1 = { ... }
+				return next(...)
+			end
+		end
+
+		local middleware2: types.Middleware = function(next)
+			return function(...)
+				args2 = { ... }
+				return next(...)
+			end
+		end
+
+		local middleware3: types.Middleware = function(next)
+			return function(...)
+				args3 = { ... }
+				return next(...)
+			end
+		end
+
+		local composed = compose({ middleware1, middleware2, middleware3 })(function(...): ()
+			return ...
+		end, {} :: never)
+
+		composed("foo", "bar", "baz")
+
+		for _, args in { args1, args2, args3 } do
+			expect(args[1]).to.equal("foo")
+			expect(args[2]).to.equal("bar")
+			expect(args[3]).to.equal("baz")
+		end
 	end)
 end

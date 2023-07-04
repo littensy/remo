@@ -11,20 +11,12 @@ local function compose(middlewares: { types.Middleware }): types.Middleware
 		return middlewares[1]
 	end
 
-	return function(last, ...)
-		local next: (...any) -> any
-
+	return function(next, ...)
 		for index = length, 1, -1 do
-			local middleware = middlewares[index]
-
-			if index == length then
-				next = middleware
-			else
-				next = middleware(next, ...)
-			end
+			next = middlewares[index](next, ...)
 		end
 
-		return next(last, ...)
+		return next
 	end
 end
 
