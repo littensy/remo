@@ -1,8 +1,13 @@
-export type Thenable<T> = {
-	andThen: (self: Thenable<T>, callback: (value: T) -> any, rejected: ((error: unknown) -> any)?) -> Thenable<T>,
-	catch: (self: Thenable<T>, callback: (error: unknown) -> any) -> Thenable<T>,
-	cancel: (self: Thenable<T>) -> (),
-	expect: (self: Thenable<T>) -> T,
+export type _Thenable<R> = {
+	andThen: <U>(self: _Thenable<R>, onFulfill: (R) -> ...U, onReject: (error: any) -> ...U) -> (),
+}
+
+export type Thenable<R> = {
+	andThen: <U>(
+		self: Thenable<R>,
+		onFulfill: (R) -> ...(_Thenable<U> | U),
+		onReject: (error: any) -> ...(_Thenable<U> | U)
+	) -> nil | _Thenable<U>,
 }
 
 -- Overloaded to satisfy 't' types and silence the linter
@@ -57,18 +62,21 @@ export type ClientEvent<Args... = ...any> = {
 	destroy: (self: ClientEvent<Args...>) -> (),
 }
 
-export type ServerFunction<Value = any, Args... = ...any> = {
+export type ServerFunction<Returns = any, Args... = ...any> = {
 	name: string,
-	onInvoke: (self: ServerFunction<Value, Args...>, callback: (player: Player, Args...) -> Value) -> (),
-	invoke: (self: ServerFunction<Value, Args...>, player: Player, Args...) -> Thenable<Value>,
-	destroy: (self: ServerFunction<Value, Args...>) -> (),
+	onInvoke: (
+		self: ServerFunction<Returns, Args...>,
+		callback: (player: Player, Args...) -> Returns | Thenable<Returns>
+	) -> (),
+	invoke: (self: ServerFunction<Returns, Args...>, player: Player, Args...) -> Thenable<Returns>,
+	destroy: (self: ServerFunction<Returns, Args...>) -> (),
 }
 
-export type ClientFunction<Value = any, Args... = ...any> = {
+export type ClientFunction<Returns = any, Args... = ...any> = {
 	name: string,
-	onInvoke: (self: ClientFunction<Value, Args...>, callback: (Args...) -> Value) -> (),
-	invoke: (self: ClientFunction<Value, Args...>, Args...) -> Thenable<Value>,
-	destroy: (self: ClientFunction<Value, Args...>) -> (),
+	onInvoke: (self: ClientFunction<Returns, Args...>, callback: (Args...) -> Returns | Thenable<Returns>) -> (),
+	invoke: (self: ClientFunction<Returns, Args...>, Args...) -> Thenable<Returns>,
+	destroy: (self: ClientFunction<Returns, Args...>) -> (),
 }
 
 export type Remotes<Client = ClientRemotes, Server = ServerRemotes> = {

@@ -21,7 +21,6 @@ local function promiseRemoteEvent(name: string): types.Thenable<RemoteEvent>
 end
 
 local function createClientEvent(name: string, builder: types.RemoteBuilder): types.ClientEvent
-	local promise: types.Thenable<RemoteEvent>
 	local connection: RBXScriptConnection?
 	local connected = true
 
@@ -48,8 +47,10 @@ local function createClientEvent(name: string, builder: types.RemoteBuilder): ty
 
 			local arguments = table.pack(...)
 
-			promiseRemoteEvent(name):andThen(function(instance): ()
+			promiseRemoteEvent(name):andThen(function(instance)
 				instance:FireServer(table.unpack(arguments, 1, arguments.n))
+			end, function(error): ()
+				warn(`Failed to fire event '{name}': {error}`)
 			end)
 		end,
 
@@ -63,8 +64,6 @@ local function createClientEvent(name: string, builder: types.RemoteBuilder): ty
 			if connection then
 				connection:Disconnect()
 				connection = nil
-			else
-				promise:cancel()
 			end
 
 			table.clear(listeners)
@@ -77,7 +76,11 @@ local function createClientEvent(name: string, builder: types.RemoteBuilder): ty
 		end
 	end, clientEvent)
 
-	promise = promiseRemoteEvent(name):andThen(function(instance): ()
+	promiseRemoteEvent(name):andThen(function(instance)
+		if not connected then
+			return
+		end
+
 		connection = instance.OnClientEvent:Connect(function(...)
 			for index, validator in builder.metadata.parameters do
 				local value = select(index, ...)
@@ -86,6 +89,8 @@ local function createClientEvent(name: string, builder: types.RemoteBuilder): ty
 
 			emit(...)
 		end)
+	end, function(error): ()
+		warn(`Failed to initialize event '{name}': {error}`)
 	end)
 
 	return clientEvent

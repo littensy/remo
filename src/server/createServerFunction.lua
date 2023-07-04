@@ -2,6 +2,7 @@ local Promise = require(script.Parent.Parent.Promise)
 local types = require(script.Parent.Parent.types)
 local constants = require(script.Parent.Parent.constants)
 local compose = require(script.Parent.Parent.utils.compose)
+local thenable = require(script.Parent.Parent.utils.thenable)
 local mockRemotes = require(script.Parent.Parent.utils.mockRemotes)
 
 local remotes = script.Parent.Parent.remotes
@@ -62,7 +63,7 @@ local function createServerFunction(name: string, builder: types.RemoteBuilder):
 	}
 
 	local invoke = compose(builder.metadata.middleware)(function(...)
-		return handler(...)
+		return thenable.unwrap(handler(...))
 	end, serverFunction)
 
 	function instance.OnServerInvoke(player: Player, ...)

@@ -9,17 +9,17 @@ return function()
 
 	local remotes: types.Remotes<{
 		event: types.ClientEvent<string, number>,
-		callback: types.ClientFunction<string, string, number>,
+		callback: types.ClientFunction<string, (string, number)>,
 		namespace: {
 			event: types.ClientEvent<string, number>,
-			callback: types.ClientFunction<string, string, number>,
+			callback: types.ClientFunction<string, (string, number)>,
 		},
 	}, {
 		event: types.ServerEvent<string, number>,
-		callback: types.ServerFunction<string, string, number>,
+		callback: types.ServerFunction<string, (string, number)>,
 		namespace: {
 			event: types.ServerEvent<string, number>,
-			callback: types.ServerFunction<string, string, number>,
+			callback: types.ServerFunction<string, (string, number)>,
 		},
 	}>
 

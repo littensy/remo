@@ -2,6 +2,7 @@ local Promise = require(script.Parent.Parent.Promise)
 local types = require(script.Parent.Parent.types)
 local constants = require(script.Parent.Parent.constants)
 local compose = require(script.Parent.Parent.utils.compose)
+local thenable = require(script.Parent.Parent.utils.thenable)
 local mockRemotes = require(script.Parent.Parent.utils.mockRemotes)
 
 local remotes = script.Parent.Parent.remotes
@@ -23,7 +24,6 @@ end
 local function createClientFunction(name: string, builder: types.RemoteBuilder): types.ClientFunction
 	assert(builder.metadata.returns, `Missing return value validator for function '{name}'`)
 
-	local promise: types.Thenable<RemoteFunction>
 	local connected = true
 
 	local function handler(...)
@@ -47,7 +47,9 @@ local function createClientFunction(name: string, builder: types.RemoteBuilder):
 				local response = instance:InvokeServer(table.unpack(arguments, 1, arguments.n))
 				assert(builder.metadata.returns(response), `Invalid return value for function '{name}': got {response}`)
 				return response
-			end)
+			end, function(error): ()
+				warn(`Failed to invoke function '{name}': {error}`)
+			end) :: any
 		end,
 
 		destroy = function(self)
@@ -60,16 +62,18 @@ local function createClientFunction(name: string, builder: types.RemoteBuilder):
 			function handler()
 				error(`Remote function '{name}' was invoked after it was destroyed`)
 			end
-
-			promise:cancel()
 		end,
 	}
 
 	local invoke = compose(builder.metadata.middleware)(function(...)
-		return handler(...)
+		return thenable.unwrap(handler(...))
 	end, clientFunction)
 
-	promise = promiseRemoteFunction(name):andThen(function(instance): ()
+	promiseRemoteFunction(name):andThen(function(instance): ()
+		if not connected then
+			return
+		end
+
 		function instance.OnClientInvoke(...)
 			assert(connected, `Remote function '{name}' was invoked after it was destroyed`)
 
@@ -80,6 +84,8 @@ local function createClientFunction(name: string, builder: types.RemoteBuilder):
 
 			return invoke(...)
 		end
+	end, function(error): ()
+		warn(`Failed to initialize function '{name}': {error}`)
 	end)
 
 	return clientFunction

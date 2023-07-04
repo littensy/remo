@@ -3,8 +3,10 @@ return function()
 	local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 	local t = require(ReplicatedStorage.DevPackages.t)
+	local Promise = require(script.Parent.Parent.Promise)
 	local builder = require(script.Parent.Parent.builder)
 	local mockRemotes = require(script.Parent.Parent.utils.mockRemotes)
+	local thenable = require(script.Parent.Parent.utils.thenable)
 	local createClientFunction = require(script.Parent.createClientFunction)
 
 	local player: Player = Players.LocalPlayer or {}
@@ -50,7 +52,7 @@ return function()
 		end
 
 		expect(function()
-			clientFunction:invoke("", 1):expect()
+			thenable.expect(clientFunction:invoke("", 1))
 		end).to.throw()
 
 		instance.OnServerInvoke = function()
@@ -58,7 +60,7 @@ return function()
 		end
 
 		expect(function()
-			clientFunction:invoke("", 1):expect()
+			thenable.expect(clientFunction:invoke("", 1))
 		end).to.never.throw()
 	end)
 
@@ -82,10 +84,24 @@ return function()
 		expect(b).to.equal(1)
 
 		-- outgoing invoke
-		expect(clientFunction:invoke("test2", 2):expect()).to.equal("result")
+		expect(thenable.expect(clientFunction:invoke("test2", 2))).to.equal("result")
 		expect(player).to.be.ok()
 		expect(a).to.equal("test2")
 		expect(b).to.equal(2)
+	end)
+
+	it("should unwrap promises on invoke", function()
+		local a, b
+
+		clientFunction:onInvoke(function(...)
+			a, b = ...
+			return Promise.resolve("result")
+		end)
+
+		-- incoming invoke
+		expect(instance:InvokeClient(player, "test", 1)).to.equal("result")
+		expect(a).to.equal("test")
+		expect(b).to.equal(1)
 	end)
 
 	it("should throw when used after destruction", function()
@@ -93,7 +109,7 @@ return function()
 		clientFunction:destroy()
 
 		expect(function()
-			clientFunction:invoke("", 1):expect()
+			thenable.expect(clientFunction:invoke("", 1))
 		end).to.throw()
 
 		expect(function()
