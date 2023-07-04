@@ -3,7 +3,19 @@ local constants = require(script.Parent.constants)
 local client = require(script.Parent.client)
 local server = require(script.Parent.server)
 
-local function createRemotes<Map>(builders: types.RemoteBuilders): types.Remotes<Map>
+local function deepApplyMiddleware(builders: types.RemoteBuilders, ...: types.Middleware)
+	for _, builder in builders do
+		if builder.type == "namespace" then
+			deepApplyMiddleware(builder.remotes, ...)
+		else
+			builder.middleware(...)
+		end
+	end
+end
+
+local function createRemotes<Map>(builders: types.RemoteBuilders, ...: types.Middleware): types.Remotes<Map>
+	deepApplyMiddleware(builders, ...)
+
 	local map = if constants.IS_SERVER then server.createRemotes(builders) else client.createRemotes(builders)
 
 	local function recursiveDestroy(values: any)

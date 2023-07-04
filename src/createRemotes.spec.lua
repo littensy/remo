@@ -105,4 +105,59 @@ return function()
 		expect(arg3).to.equal(1)
 		expect(result).to.equal("test")
 	end)
+
+	it("should apply middleware to every remote", function()
+		remotes:destroy()
+		mockRemotes.destroyAll()
+
+		local callOrder, middlewareRemotes, middlewareArguments = {}, {}, {}
+
+		local function middleware(index: number): types.Middleware
+			return function(next, remote)
+				table.insert(middlewareRemotes, remote)
+				return function(...)
+					table.insert(middlewareArguments, { ... })
+					table.insert(callOrder, index)
+					return next(...)
+				end
+			end
+		end
+
+		remotes = createRemotes({
+			event = builder.remote(t.string, t.number),
+			callback = builder.remote(t.string, t.number).returns(t.string),
+			namespace = builder.namespace({
+				namespaceEvent = builder.remote(t.string, t.number),
+				namespaceCallback = builder.remote(t.string, t.number).returns(t.string),
+			}),
+		}, middleware(1), middleware(2), middleware(3))
+
+		local function test(eventName, callbackName)
+			callOrder, middlewareArguments = {}, {}
+
+			mockRemotes.createMockRemoteEvent(eventName):FireServer("test", 1)
+
+			for i = 1, 3 do
+				expect(middlewareRemotes[i]).to.be.ok()
+				expect(middlewareArguments[i][1]).to.be.ok() -- player
+				expect(middlewareArguments[i][2]).to.equal("test")
+				expect(middlewareArguments[i][3]).to.equal(1)
+				expect(callOrder[i]).to.equal(i)
+			end
+
+			callOrder, middlewareArguments = {}, {}
+
+			mockRemotes.createMockRemoteFunction(callbackName):InvokeServer("test", 1)
+
+			for i = 1, 3 do
+				expect(middlewareArguments[i][1]).to.be.ok() -- player
+				expect(middlewareArguments[i][2]).to.equal("test")
+				expect(middlewareArguments[i][3]).to.equal(1)
+				expect(callOrder[i]).to.equal(i)
+			end
+		end
+
+		test("event", "callback")
+		test("namespaceEvent", "namespaceCallback")
+	end)
 end
