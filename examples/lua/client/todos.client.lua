@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local remotes = require(ReplicatedStorage.Lua.remotes)
-local names = require(script.Parent.names)
+local names = require(ReplicatedStorage.Lua.names)
 
 local todos: { string } = {}
 
