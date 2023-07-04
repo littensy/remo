@@ -2,7 +2,7 @@ local Promise = require(script.Parent.Parent.Promise)
 
 local function unwrap(...)
 	if Promise.is(...) then
-		return (... :: Promise.Promise):expect()
+		return (...):expect()
 	end
 
 	return ...
