@@ -40,12 +40,8 @@ return function()
 		local calls = 0
 
 		local middleware: types.Middleware = function(next)
-			return function(...)
-				if ... then
-					return
-				end
-
-				return next(...)
+			return function(cancel)
+				return if cancel then nil else next()
 			end
 		end
 
