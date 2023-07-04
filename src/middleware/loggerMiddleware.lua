@@ -1,35 +1,46 @@
 local types = require(script.Parent.Parent.types)
 
 local function stringify(...)
-	local args = table.pack(...)
+	local output = {}
 
-	for index, value in ipairs(args) do
+	for index = 1, select("#", ...) do
+		local value = select(index, ...)
+
+		table.insert(output, `{if index > 1 then "\n" else ""}\t{index}.`)
+
 		if type(value) == "string" then
-			args[index] = string.format("%q", value)
+			table.insert(output, string.format("%q", value))
 		elseif type(value) == "userdata" then
-			args[index] = `{typeof(value)}({value})`
+			table.insert(output, `{typeof(value)}({value})`)
+		else
+			table.insert(output, value)
 		end
-
-		args[index] = `\n\t{index}. {args[index]}`
 	end
 
-	return table.unpack(args, 1, args.n)
+	if #output == 0 then
+		return "\t1. (void)\n"
+	end
+
+	table.insert(output, "\n")
+
+	return table.unpack(output)
 end
 
 local loggerMiddleware: types.Middleware = function(next, remote)
 	return function(...)
 		if remote.type == "event" then
-			print(`[Remo] {remote.name} fired:`, stringify(...))
+			print(`\n🟡 (remote) {remote.name}\n\n`, stringify(...))
 			return next(...)
 		end
 
-		print(`[Remo] {remote.name} request:`, stringify(...))
+		print(`\n🟣 (async remote) {remote.name}\n`)
+		print(`Parameters\n`, stringify(...))
 
-		local result = table.pack(next(...))
+		local results = table.pack(next(...))
 
-		print(`[Remo] {remote.name} response:`, stringify(table.unpack(result, 1, result.n)))
+		print("Returns\n", stringify(table.unpack(results, 1, results.n)))
 
-		return table.unpack(result, 1, result.n)
+		return table.unpack(results, 1, results.n)
 	end
 end
 
