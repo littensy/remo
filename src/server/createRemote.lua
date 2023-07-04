@@ -35,7 +35,6 @@ local function createEventRemote(name: string, builder: types.RemoteBuilder): ty
 
 	local function fireAllExcept(self, exception, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
-
 		for _, player in Players:GetPlayers() do
 			if player ~= exception then
 				instance:FireClient(player, ...)
