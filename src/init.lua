@@ -1,6 +1,7 @@
 local types = require(script.types)
 local createRemotes = require(script.createRemotes)
 local builder = require(script.builder)
+local loggerMiddleware = require(script.middleware.loggerMiddleware)
 
 export type Promise<T> = types.Promise<T>
 export type PromiseConstructor = types.PromiseConstructor
@@ -29,4 +30,5 @@ return {
 	remote = builder.remote,
 	namespace = builder.namespace,
 	createRemotes = createRemotes,
+	loggerMiddleware = loggerMiddleware,
 }
