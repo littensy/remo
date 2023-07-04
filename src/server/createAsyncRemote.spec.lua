@@ -112,12 +112,12 @@ return function()
 	end)
 
 	it("should apply the middleware", function()
-		local middlewareServerFunction, playerInvoked, arg1, arg2, result
+		local middlewareRemote, playerInvoked, arg1, arg2, result
 
 		asyncRemote = createAsyncRemote(
 			"test",
-			builder.remote(t.string, t.number).returns(t.string).middleware(function(next, serverFunction)
-				middlewareServerFunction = serverFunction
+			builder.remote(t.string, t.number).returns(t.string).middleware(function(next, remote)
+				middlewareRemote = remote
 				return function(player, ...)
 					result = next(player, "intercepted", 2)
 					return result .. "!"
@@ -125,7 +125,7 @@ return function()
 			end)
 		)
 
-		expect(middlewareServerFunction).to.equal(asyncRemote)
+		expect(middlewareRemote).to.equal(asyncRemote)
 
 		asyncRemote:onRequest(function(...)
 			playerInvoked, arg1, arg2 = ...

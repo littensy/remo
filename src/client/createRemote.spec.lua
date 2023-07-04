@@ -89,19 +89,19 @@ return function()
 	end)
 
 	it("should apply the middleware", function()
-		local middlewareClientEvent, arg1, arg2
+		local middlewareRemote, arg1, arg2
 
 		remote = createRemote(
 			"test",
-			builder.remote(t.string, t.number).middleware(function(next, clientEvent)
-				middlewareClientEvent = clientEvent
+			builder.remote(t.string, t.number).middleware(function(next, remote)
+				middlewareRemote = remote
 				return function(...)
 					return next("intercepted", 2)
 				end
 			end)
 		)
 
-		expect(middlewareClientEvent).to.equal(remote)
+		expect(middlewareRemote).to.equal(remote)
 
 		remote:connect(function(...)
 			arg1, arg2 = ...
