@@ -4,8 +4,7 @@ export type Promise<T> = Promise.Promise<T>
 
 export type PromiseConstructor = Promise.PromiseConstructor
 
--- Overloaded to satisfy 't' types and silence the linter
-export type Validator = (<T>(value: T) -> boolean) & <T>(value: any) -> boolean
+export type Validator = any
 
 export type Cleanup = () -> ()
 
@@ -18,7 +17,7 @@ export type MiddlewareContext = {
 export type RemoteBuilder = {
 	type: RemoteType,
 	metadata: RemoteBuilderMetadata,
-	returns: (...any) -> RemoteBuilder,
+	returns: (...Validator) -> RemoteBuilder,
 	middleware: (...Middleware) -> RemoteBuilder,
 }
 
