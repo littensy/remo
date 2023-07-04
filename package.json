@@ -1,10 +1,14 @@
 {
 	"name": "@rbxts/remo",
 	"version": "0.1.0",
-	"description": "A remote event wrapper for Roblox",
+	"description": "A simple remote library for Roblox",
 	"main": "src/init.lua",
 	"scripts": {},
-	"keywords": [],
+	"keywords": [
+		"roblox",
+		"remote",
+		"rbxts"
+	],
 	"author": "littensy",
 	"license": "MIT",
 	"repository": {
