@@ -17,7 +17,7 @@ return function()
 	}>
 
 	beforeEach(function()
-		-- NOTE: This creates server remotes, so don't test client APIs in this file
+		-- This runs on the server, so don't test client APIs in this file
 		remotes = createRemotes({
 			event = builder.remote(t.string, t.number),
 			callback = builder.remote(t.string, t.number).returns(t.string),
