@@ -55,4 +55,22 @@ return function()
 
 		expect(calls).to.equal(2)
 	end)
+
+	it("should allow multiple return values", function()
+		local middleware: types.Middleware = function(next)
+			return function(...)
+				return next(...)
+			end
+		end
+
+		local composed = compose({ middleware, middleware, middleware })(function(...): (string, string, string)
+			return "foo", "bar", "baz"
+		end, {} :: never)
+
+		local a, b, c = composed("foo", "bar", "baz")
+
+		expect(a).to.equal("foo")
+		expect(b).to.equal("bar")
+		expect(c).to.equal("baz")
+	end)
 end

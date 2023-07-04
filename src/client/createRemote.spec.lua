@@ -4,108 +4,111 @@ return function()
 	local t = require(ReplicatedStorage.DevPackages.t)
 	local builder = require(script.Parent.Parent.builder)
 	local mockRemotes = require(script.Parent.Parent.utils.mockRemotes)
-	local createServerEvent = require(script.Parent.createServerEvent)
+	local createRemote = require(script.Parent.createRemote)
 
-	local serverEvent, instance
+	local remote, instance
 
 	beforeEach(function()
-		serverEvent = createServerEvent("test", builder.remote(t.string, t.number))
+		remote = createRemote("test", builder.remote(t.string, t.number))
 		instance = mockRemotes.createMockRemoteEvent("test")
 	end)
 
 	afterEach(function()
-		serverEvent:destroy()
+		remote:destroy()
 		instance:Destroy()
 	end)
 
 	it("should validate incoming argument types", function()
 		expect(function()
-			instance:FireServer(1, "")
+			instance:FireAllClients(1, "")
 		end).to.throw()
 
 		expect(function()
-			instance:FireServer("")
+			instance:FireAllClients("")
 		end).to.throw()
 
 		expect(function()
-			instance:FireServer("", 1)
+			instance:FireAllClients("", 1)
 		end).to.never.throw()
 	end)
 
 	it("should receive incoming events", function()
-		local player, a, b
-
-		serverEvent:connect(function(...)
-			player, a, b = ...
-		end)
-
-		instance:FireServer("test", 1)
-
-		expect(player).to.be.ok()
-		expect(a).to.equal("test")
-		expect(b).to.equal(1)
-	end)
-
-	it("should fire outgoing events", function()
 		local a, b
 
-		instance.OnClientEvent:Connect(function(...)
+		remote:connect(function(...)
 			a, b = ...
 		end)
 
-		serverEvent:fireAll("test", 1)
+		instance:FireAllClients("test", 1)
 		expect(a).to.equal("test")
 		expect(b).to.equal(1)
 
-		serverEvent:fireAll("test2", 2)
+		instance:FireAllClients("test2", 2)
+		expect(a).to.equal("test2")
+		expect(b).to.equal(2)
+	end)
+
+	it("should fire outgoing events", function()
+		local player, a, b
+
+		instance.OnServerEvent:Connect(function(...)
+			player, a, b = ...
+		end)
+
+		remote:fire("test", 1)
+		expect(player).to.be.ok()
+		expect(a).to.equal("test")
+		expect(b).to.equal(1)
+
+		remote:fire("test2", 2)
+		expect(player).to.be.ok()
 		expect(a).to.equal("test2")
 		expect(b).to.equal(2)
 	end)
 
 	it("should throw when used after destruction", function()
-		serverEvent:destroy()
+		remote:destroy()
 
 		expect(function()
-			serverEvent:fireAll("test", 1)
+			remote:fire("test", 1)
 		end).to.throw()
 
 		expect(function()
-			serverEvent:connect(function() end)
+			remote:connect(function() end)
 		end).to.throw()
 	end)
 
 	it("should not fire disconnected events", function()
 		local fired = false
-		local disconnect = serverEvent:connect(function()
+		local disconnect = remote:connect(function()
 			fired = true
 		end)
 		disconnect()
-		serverEvent:fireAll("test", 1)
+		instance:FireAllClients("intercepted", 1)
 		expect(fired).to.equal(false)
 	end)
 
 	it("should apply the middleware", function()
-		local middlewareServerEvent, player, arg1, arg2
+		local middlewareClientEvent, arg1, arg2
 
-		serverEvent = createServerEvent(
+		remote = createRemote(
 			"test",
-			builder.remote(t.string, t.number).middleware(function(next, serverEvent)
-				middlewareServerEvent = serverEvent
-				return function(player, ...)
-					return next(player, "intercepted", 2)
+			builder.remote(t.string, t.number).middleware(function(next, clientEvent)
+				middlewareClientEvent = clientEvent
+				return function(...)
+					return next("intercepted", 2)
 				end
 			end)
 		)
 
-		expect(middlewareServerEvent).to.equal(serverEvent)
+		expect(middlewareClientEvent).to.equal(remote)
 
-		serverEvent:connect(function(...)
-			player, arg1, arg2 = ...
+		remote:connect(function(...)
+			arg1, arg2 = ...
 		end)
 
-		instance:FireServer("test", 1)
+		instance:FireAllClients("test", 1)
 
-		expect(player).to.be.ok()
 		expect(arg1).to.equal("intercepted")
 		expect(arg2).to.equal(2)
 	end)

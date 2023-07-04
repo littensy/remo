@@ -1,28 +1,33 @@
 local types = require(script.Parent.types)
 
 local function remote(...: types.Validator): types.RemoteBuilder
+	local builder: types.RemoteBuilder
+
 	local metadata: types.RemoteBuilderMetadata = {
 		parameters = { ... },
-		returns = nil,
+		returns = {},
 		middleware = {},
 	}
 
-	local builder = {
-		type = "remote",
-		metadata = metadata,
-	} :: types.RemoteBuilder
-
-	function builder.returns(validator: types.Validator): types.RemoteBuilder
-		metadata.returns = validator
+	local function returns(...)
+		builder.type = "function"
+		metadata.returns = { ... }
 		return builder
 	end
 
-	function builder.middleware(...: types.Middleware): types.RemoteBuilder
-		for _, middleware in { ... } do
-			table.insert(metadata.middleware, middleware)
+	local function middleware(...)
+		for index = 1, select("#", ...) do
+			table.insert(metadata.middleware, (select(index, ...)))
 		end
 		return builder
 	end
+
+	builder = {
+		type = "event",
+		metadata = metadata,
+		returns = returns,
+		middleware = middleware,
+	}
 
 	return builder
 end

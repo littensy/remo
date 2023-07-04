@@ -1,21 +1,21 @@
 local types = require(script.Parent.types)
-local createServerEvent = require(script.createServerEvent)
-local createServerFunction = require(script.createServerFunction)
+local createAsyncRemote = require(script.createAsyncRemote)
+local createRemote = require(script.createRemote)
 
-local function createServerRemotes(builders: types.RemoteBuilders, namespace: string?): types.ServerRemotes
-	local server: types.ServerRemotes = {}
-	local prefix = namespace and `{namespace}.` or ""
+local function createRemotes(builders: types.RemoteBuilders): types.RemoteMap
+	local remotes: types.RemoteMap = {}
 
-	for key, builder in builders do
-		server[key] = if builder.type == "namespace"
-			then createServerRemotes(builder.remotes, key)
-			elseif builder.metadata.returns then createServerFunction(prefix .. key, builder)
-			else createServerEvent(prefix .. key, builder)
+	for name, builder in builders do
+		remotes[name] = if builder.type == "namespace"
+			then createRemotes(builder.remotes)
+			elseif builder.type == "event" then createRemote(name, builder)
+			elseif builder.type == "function" then createAsyncRemote(name, builder)
+			else error(`Invalid remote type "{builder.type}"`)
 	end
 
-	return server
+	return remotes
 end
 
 return {
-	createServerRemotes = createServerRemotes,
+	createRemotes = createRemotes,
 }

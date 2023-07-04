@@ -1,28 +1,22 @@
-export type _Thenable<R> = {
-	andThen: <U>(self: _Thenable<R>, onFulfill: (R) -> ...U, onReject: (error: any) -> ...U) -> (),
-}
+local Promise = require(script.Parent.Promise)
 
-export type Thenable<R> = {
-	andThen: <U>(
-		self: Thenable<R>,
-		onFulfill: (R) -> ...(_Thenable<U> | U),
-		onReject: (error: any) -> ...(_Thenable<U> | U)
-	) -> nil | _Thenable<U>,
-}
+export type Promise<T> = Promise.Promise<T>
+
+export type PromiseConstructor = Promise.PromiseConstructor
 
 -- Overloaded to satisfy 't' types and silence the linter
 export type Validator = (<T>(value: T) -> boolean) & <T>(value: any) -> boolean
 
 export type Cleanup = () -> ()
 
-export type Middleware = (next: (...any) -> any, remote: AnyRemote) -> (...any) -> any
+export type Middleware = (next: (...any) -> ...any, remote: AnyRemote) -> (...any) -> ...any
 
 export type MiddlewareContext = {
 	player: Player,
 }
 
 export type RemoteBuilder = {
-	type: "remote",
+	type: RemoteType,
 	metadata: RemoteBuilderMetadata,
 	returns: (...any) -> RemoteBuilder,
 	middleware: (...Middleware) -> RemoteBuilder,
@@ -30,7 +24,7 @@ export type RemoteBuilder = {
 
 export type RemoteBuilderMetadata = {
 	parameters: { Validator },
-	returns: Validator?,
+	returns: { Validator },
 	middleware: { Middleware },
 }
 
@@ -43,58 +37,60 @@ export type RemoteBuilders = {
 	[string]: RemoteBuilder | RemoteNamespace,
 }
 
-export type AnyRemote = ClientEvent | ClientFunction | ServerEvent | ServerFunction
+export type RemoteType = "event" | "function"
 
-export type ServerEvent<Args... = ...any> = {
+export type AnyRemote = Remote | AsyncRemote
+
+export type Remote<Args... = ...any> = ClientToServer<Args...> & ServerToClient<Args...>
+
+export type ClientToServer<Args... = ...any> = {
 	name: string,
 	type: "event",
-	connect: (self: ServerEvent<Args...>, callback: (Args...) -> ()) -> Cleanup,
-	fire: (self: ServerEvent<Args...>, player: Player, Args...) -> (),
-	fireExcept: (self: ServerEvent<Args...>, player: Player, Args...) -> (),
-	firePlayers: (self: ServerEvent<Args...>, players: { Player }, Args...) -> (),
-	fireAll: (self: ServerEvent<Args...>, Args...) -> (),
-	destroy: (self: ServerEvent<Args...>) -> (),
+	connect: (self: ClientToServer<Args...>, callback: (player: Player, Args...) -> ()) -> Cleanup,
+	fire: (self: ClientToServer<Args...>, Args...) -> (),
+	destroy: (self: ClientToServer<Args...>) -> (),
 }
 
-export type ClientEvent<Args... = ...any> = {
+export type ServerToClient<Args... = ...any> = {
 	name: string,
 	type: "event",
-	connect: (self: ClientEvent<Args...>, callback: (Args...) -> ()) -> Cleanup,
-	fire: (self: ClientEvent<Args...>, Args...) -> (),
-	destroy: (self: ClientEvent<Args...>) -> (),
+	connect: (self: ServerToClient<Args...>, callback: (Args...) -> ()) -> Cleanup,
+	fire: (self: ServerToClient<Args...>, player: Player, Args...) -> (),
+	firePlayers: (self: ServerToClient<Args...>, players: { Player }, Args...) -> (),
+	fireAll: (self: ServerToClient<Args...>, Args...) -> (),
+	fireAllExcept: (self: ServerToClient<Args...>, player: Player, Args...) -> (),
+	destroy: (self: ServerToClient<Args...>) -> (),
 }
 
-export type ServerFunction<Returns = any, Args... = ...any> = {
+export type AsyncRemote<Returns = any, Args... = ...any> =
+	ClientToServerAsync<Returns, Args...>
+	& ServerToClientAsync<Returns, Args...>
+
+export type ServerToClientAsync<Returns = any, Args... = ...any> = {
 	name: string,
 	type: "function",
-	onInvoke: (
-		self: ServerFunction<Returns, Args...>,
-		callback: (player: Player, Args...) -> Returns | Thenable<Returns>
+	onRequest: (self: ServerToClientAsync<Returns, Args...>, callback: (Args...) -> Returns | Promise<Returns>) -> (),
+	request: (self: ServerToClientAsync<Returns, Args...>, player: Player, Args...) -> Promise<Returns>,
+	destroy: (self: ServerToClientAsync<Returns, Args...>) -> (),
+}
+
+export type ClientToServerAsync<Returns = any, Args... = ...any> = {
+	name: string,
+	type: "function",
+	onRequest: (
+		self: ClientToServerAsync<Returns, Args...>,
+		callback: (player: Player, Args...) -> Returns | Promise<Returns>
 	) -> (),
-	invoke: (self: ServerFunction<Returns, Args...>, player: Player, Args...) -> Thenable<Returns>,
-	destroy: (self: ServerFunction<Returns, Args...>) -> (),
+	request: (self: ClientToServerAsync<Returns, Args...>, Args...) -> Promise<Returns>,
+	destroy: (self: ClientToServerAsync<Returns, Args...>) -> (),
 }
 
-export type ClientFunction<Returns = any, Args... = ...any> = {
-	name: string,
-	type: "function",
-	onInvoke: (self: ClientFunction<Returns, Args...>, callback: (Args...) -> Returns | Thenable<Returns>) -> (),
-	invoke: (self: ClientFunction<Returns, Args...>, Args...) -> Thenable<Returns>,
-	destroy: (self: ClientFunction<Returns, Args...>) -> (),
+export type Remotes<Map = RemoteMap> = Map & {
+	destroy: (self: Remotes<Map>) -> (),
 }
 
-export type Remotes<Client = ClientRemotes, Server = ServerRemotes> = {
-	client: Client,
-	server: Server,
-	destroy: (self: Remotes<Client, Server>) -> (),
-}
-
-export type ClientRemotes = {
-	[string]: ClientEvent | ClientFunction | ClientRemotes,
-}
-
-export type ServerRemotes = {
-	[string]: ServerEvent | ServerFunction | ServerRemotes,
+export type RemoteMap = {
+	[string]: AnyRemote | RemoteMap,
 }
 
 return nil
