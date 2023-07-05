@@ -1,12 +1,12 @@
 [package]
 name = "littensy/remo"
 description = "A simple remote library for Roblox"
-version = "0.1.0"
+version = "0.3.0"
 license = "MIT"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
 exclude = ["**"]
-include = ["src", "default.project.json", "wally.toml", "LICENSE"]
+include = ["src", "src/**", "default.project.json", "wally.toml", "LICENSE"]
 
 [dependencies]
 Promise = "evaera/promise@4.0.0"
