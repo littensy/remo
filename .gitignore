@@ -9,7 +9,8 @@
 *.tsbuildinfo
 *.rbxlx
 sourcemap.json
-globalTypes.d.lua
+roblox.d.lua
+types.d.lua
 
 # Misc
 /.vscode

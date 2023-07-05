@@ -29,10 +29,10 @@ jobs:
         run: rojo sourcemap test.project.json -o sourcemap.json
 
       - name: Download global Roblox types
-        run: curl -O https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.lua
+        run: sh scripts/types.sh
 
       - name: Analyze
-        run: luau-lsp analyze --definitions=globalTypes.d.lua --base-luaurc=.luaurc --sourcemap=sourcemap.json src
+        run: luau-lsp analyze --definitions=scripts/types.d.lua --base-luaurc=.luaurc --sourcemap=sourcemap.json --ignore="DevPackages/**" --no-strict-dm-types src
 
       - name: Lint
         run: selene src
