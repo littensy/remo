@@ -1,0 +1,29 @@
+{
+	"name": "remo-lua-example",
+	"tree": {
+		"$className": "DataModel",
+
+		"ReplicatedStorage": {
+			"Packages": {
+				"$path": "Packages"
+			},
+			"Shared": {
+				"$path": "src/shared"
+			}
+		},
+
+		"ServerScriptService": {
+			"Server": {
+				"$path": "src/server"
+			}
+		},
+
+		"StarterPlayer": {
+			"StarterPlayerScripts": {
+				"Client": {
+					"$path": "src/client"
+				}
+			}
+		}
+	}
+}

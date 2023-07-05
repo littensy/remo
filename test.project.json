@@ -12,24 +12,6 @@
 			},
 			"DevPackages": {
 				"$path": "DevPackages"
-			},
-			"Lua": {
-				"$path": "examples/lua/shared"
-			}
-		},
-		"ServerScriptService": {
-			"$className": "ServerScriptService",
-			"Lua": {
-				"$path": "examples/lua/server"
-			}
-		},
-		"StarterPlayer": {
-			"$className": "StarterPlayer",
-			"StarterPlayerScripts": {
-				"$className": "StarterPlayerScripts",
-				"Lua": {
-					"$path": "examples/lua/client"
-				}
 			}
 		},
 		"TestService": {

@@ -1,7 +1,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local remotes = require(ReplicatedStorage.Lua.remotes)
+local remotes = require(ReplicatedStorage.Shared.remotes)
 
 local todos: { string } = { "Milk", "Eggs" }
 local changed = false
