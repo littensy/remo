@@ -12,8 +12,7 @@ on:
       - ci
 
 jobs:
-  lint:
-    name: Lint
+  analyze:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -29,31 +28,32 @@ jobs:
         run: rojo sourcemap test.project.json -o sourcemap.json
 
       - name: Download global Roblox types
-        run: sh scripts/types.sh
+        run: curl -o scripts/roblox.d.lua https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.lua  
 
       - name: Analyze
-        run: luau-lsp analyze --definitions=scripts/types.d.lua --base-luaurc=.luaurc --sourcemap=sourcemap.json --ignore="DevPackages/**" --no-strict-dm-types src
+        run: luau-lsp analyze --defs=scripts/testez.d.lua --defs=scripts/roblox.d.lua --base-luaurc=.luaurc --sourcemap=sourcemap.json --ignore="**/_Index/**" --no-strict-dm-types src
 
-      - name: Lint
-        run: selene src
-
-      - name: Check code style
-        uses: JohnnyMorganz/stylua-action@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          version: v0.18.0
-          args: --check src
+      - name: Check code quality
+        run: |
+          selene src
+          stylua --check src
 
   test:
-    name: Test
-    runs-on: macos-latest
-    needs: lint
+    runs-on: windows-latest
+    needs: analyze
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Install Aftman
         uses: ok-nick/setup-aftman@v0
+        
+      - name: Download Roblox Studio
+        uses: OrbitalOwen/roblox-win-installer-action@1.1
+        with:
+            cookie: ${{ secrets.ROBLOSECURITY }}
+            token: ${{ secrets.GITHUB_TOKEN }}
+            timeout-minutes: 10
 
       - name: Install Wally dependencies
         run: wally install
@@ -62,4 +62,4 @@ jobs:
         run: rojo build test.project.json -o test.rbxlx
 
       - name: Run tests
-        run: run-in-roblox --place test.rbxlx --script test/init.server.lua
+        run: run-in-roblox --place test.rbxlx --script scripts/run-tests.server.lua
