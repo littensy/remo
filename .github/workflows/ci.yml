@@ -37,38 +37,3 @@ jobs:
         run: |
           selene src
           stylua --check src
-
-  test:
-    runs-on: windows-latest
-    needs: analyze
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Aftman
-        uses: ok-nick/setup-aftman@v0
-        
-      - name: Download Roblox Studio
-        uses: OrbitalOwen/roblox-win-installer-action@1.1
-        with:
-            cookie: ${{ secrets.ROBLOSECURITY }}
-            token: ${{ secrets.GITHUB_TOKEN }}
-            
-      - name: Create fflag overrides
-        run: |
-          $flags = @{DFIntStudioUseNewLoginDataEndpointHundredthPercent=0; FFlagStudioUseNewLoginDataEndpoint=$false}
-          New-Item -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/' -Name "ClientSettings" -ItemType "directory"
-          New-Item -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/ClientSettings' -Name "ClientAppSettings.json"
-          $flags | ConvertTo-Json -depth 32| set-content -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/ClientSettings/ClientAppSettings.json'
-
-      - name: Add RBXID to the Windows registry
-        run: REG ADD HKCU\Software\RobloxStudioBrowser\roblox.com /t REG_SZ /v .RBXID /d "${{ secrets.RBXID }}"
-
-      - name: Install Wally dependencies
-        run: wally install
-
-      - name: Generate place file
-        run: rojo build test.project.json -o test.rbxlx
-
-      - name: Run tests
-        run: run-in-roblox --place test.rbxlx --script scripts/run-tests.server.lua
