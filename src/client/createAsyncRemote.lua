@@ -1,26 +1,7 @@
-local Promise = require(script.Parent.Parent.Promise)
 local types = require(script.Parent.Parent.types)
-local constants = require(script.Parent.Parent.constants)
-
 local compose = require(script.Parent.Parent.utils.compose)
-local mockRemotes = require(script.Parent.Parent.utils.mockRemotes)
+local instances = require(script.Parent.Parent.utils.instances)
 local unwrap = require(script.Parent.Parent.utils.unwrap)
-
-local container = script.Parent.Parent.container
-
-local function promiseRemoteFunction(name: string): Promise.Promise<RemoteFunction>
-	if container:FindFirstChild(name) then
-		return Promise.resolve(container[name])
-	end
-
-	if constants.IS_EDIT then
-		return Promise.resolve(mockRemotes.createMockRemoteFunction(name))
-	end
-
-	return Promise.fromEvent(container.ChildAdded, function(child)
-		return child:IsA("RemoteFunction") and child.Name == name
-	end)
-end
 
 local function createAsyncRemote(name: string, builder: types.RemoteBuilder): types.AsyncRemote
 	local connected = true
@@ -39,7 +20,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 
 		local arguments = table.pack(...)
 
-		return promiseRemoteFunction(name):andThen(function(instance)
+		return instances.promiseRemoteFunction(name):andThen(function(instance)
 			local response = table.pack(instance:InvokeServer(table.unpack(arguments, 1, arguments.n)))
 
 			for index, validator in builder.metadata.returns do
@@ -72,7 +53,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		return unwrap(handler(...))
 	end, asyncRemote)
 
-	promiseRemoteFunction(name):andThen(function(instance): ()
+	instances.promiseRemoteFunction(name):andThen(function(instance): ()
 		if not connected then
 			return
 		end
