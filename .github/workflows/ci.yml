@@ -39,7 +39,7 @@ jobs:
           stylua --check src
 
   test:
-    runs-on: windows-latest
+    runs-on: windows-2019
     needs: analyze
     steps:
       - name: Checkout code
@@ -53,7 +53,6 @@ jobs:
         with:
             cookie: ${{ secrets.ROBLOSECURITY }}
             token: ${{ secrets.GITHUB_TOKEN }}
-            timeout-minutes: 10
 
       - name: Install Wally dependencies
         run: wally install
