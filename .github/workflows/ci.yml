@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - ci
+
+  pull_request:
+    branches:
+      - main
+      - ci
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Aftman
+        uses: ok-nick/setup-aftman@v0
+
+      - name: Generate sourcemap.json
+        run: rojo sourcemap test.project.json -o sourcemap.json
+
+      - name: Download global Roblox types
+        run: curl -O https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.lua
+
+      - name: Analyze
+        run: luau-lsp analyze --definitions=globalTypes.d.lua --base-luaurc=.luaurc --sourcemap=sourcemap.json src
+
+      - name: Lint
+        run: selene src
+
+      - name: Check code style
+        uses: JohnnyMorganz/stylua-action@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: v0.18.0
+          args: --check src
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Aftman
+        uses: ok-nick/setup-aftman@v0
+
+      - name: Generate place file
+        run: rojo build test.project.json -o test.rbxlx
+
+      - name: Run tests
+        run: run-in-roblox --place test.rbxlx --script test/init.server.lua
