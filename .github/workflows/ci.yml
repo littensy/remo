@@ -53,6 +53,16 @@ jobs:
         with:
             cookie: ${{ secrets.ROBLOSECURITY }}
             token: ${{ secrets.GITHUB_TOKEN }}
+            
+      - name: Create fflag overrides
+        run: |
+          $flags = @{DFIntStudioUseNewLoginDataEndpointHundredthPercent=0; FFlagStudioUseNewLoginDataEndpoint=$false}
+          New-Item -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/' -Name "ClientSettings" -ItemType "directory"
+          New-Item -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/ClientSettings' -Name "ClientAppSettings.json"
+          $flags | ConvertTo-Json -depth 32| set-content -Path 'C:/Program Files (x86)/Roblox/Versions/version-*/ClientSettings/ClientAppSettings.json'
+
+      - name: Add RBXID to the Windows registry
+        run: REG ADD HKCU\Software\RobloxStudioBrowser\roblox.com /t REG_SZ /v .RBXID /d "${{ secrets.RBXID }}"
 
       - name: Install Wally dependencies
         run: wally install
