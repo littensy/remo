@@ -1,9 +1,16 @@
+# Dependencies
 /node_modules
 /Packages
 /DevPackages
+
+# Project output
 /out
 /include
-/.vscode
 *.tsbuildinfo
-.DS_Store
+*.rbxlx
 sourcemap.json
+globalTypes.d.lua
+
+# Misc
+/.vscode
+.DS_Store
