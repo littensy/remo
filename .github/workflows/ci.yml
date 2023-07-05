@@ -39,7 +39,7 @@ jobs:
           stylua --check src
 
   test:
-    runs-on: windows-2019
+    runs-on: windows-latest
     needs: analyze
     steps:
       - name: Checkout code
