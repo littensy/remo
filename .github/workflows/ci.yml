@@ -15,13 +15,12 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Install Aftman
         uses: ok-nick/setup-aftman@v0
 
-      - name: Install Wally dependencies
+      - name: Install dependencies
         run: wally install
 
       - name: Generate sourcemap.json
@@ -37,3 +36,6 @@ jobs:
         run: |
           selene src
           stylua --check src
+
+      - name: Build model
+        run: rojo build -o remo.rbxm

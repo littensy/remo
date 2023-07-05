@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Remove spec files
+        run: rm -rf **/*.spec.lua
+
+      - name: Install packages
+        run: wally install
+
+      - name: Build model
+        run: rojo build -o remo.rbxm
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v1
+        if: ${{ github.event.release }}
+        with:
+          files: remo.rbxm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

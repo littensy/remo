@@ -7,7 +7,8 @@
 /out
 /include
 *.tsbuildinfo
-*.rbxlx
+*.rbxl
+*.rbxm
 sourcemap.json
 roblox.d.lua
 types.d.lua
