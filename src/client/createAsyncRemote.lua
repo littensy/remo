@@ -41,13 +41,17 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		end
 	end
 
-	local asyncRemote: types.AsyncRemote = {
+	local asyncRemoteNotCallable: types.AsyncRemoteNotCallable = {
 		name = name,
 		type = "function" :: "function",
 		onRequest = onRequest,
 		request = request,
 		destroy = destroy,
 	}
+
+	local asyncRemote = setmetatable(asyncRemoteNotCallable, {
+		__call = request,
+	}) :: types.AsyncRemote
 
 	local invoke = compose(builder.metadata.middleware)(function(...)
 		return unwrap(handler(...))

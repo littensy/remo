@@ -8,11 +8,11 @@ return function()
 	local mockRemotes = require(script.Parent.utils.mockRemotes)
 
 	local remotes: types.Remotes<{
-		event: types.Remote<string, number>,
-		callback: types.AsyncRemote<string, (string, number)>,
+		event: types.ClientToServer<string, number>,
+		callback: types.ClientToServerAsync<string, (string, number)>,
 		namespace: {
-			namespaceEvent: types.Remote<string, number>,
-			namespaceCallback: types.AsyncRemote<string, (string, number)>,
+			namespaceEvent: types.ClientToServer<string, number>,
+			namespaceCallback: types.ClientToServerAsync<string, (string, number)>,
 		},
 	}>
 

@@ -43,7 +43,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		end
 	end
 
-	local remote: types.AsyncRemote = {
+	local asyncRemoteNotCallable: types.AsyncRemoteNotCallable = {
 		name = name,
 		type = "function" :: "function",
 		onRequest = onRequest,
@@ -51,9 +51,13 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		destroy = destroy,
 	}
 
+	local asyncRemote = setmetatable(asyncRemoteNotCallable, {
+		__call = request,
+	}) :: types.AsyncRemote
+
 	local invoke = compose(builder.metadata.middleware)(function(...)
 		return unwrap(handler(...))
-	end, remote)
+	end, asyncRemote)
 
 	function instance.OnServerInvoke(player: Player, ...)
 		for index, validator in builder.metadata.parameters do
@@ -64,7 +68,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		return invoke(player, ...)
 	end
 
-	return remote
+	return asyncRemote
 end
 
 return createAsyncRemote

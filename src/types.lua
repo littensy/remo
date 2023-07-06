@@ -65,23 +65,38 @@ export type AsyncRemote<Returns = any, Args... = ...any> =
 	ClientToServerAsync<Returns, Args...>
 	& ServerToClientAsync<Returns, Args...>
 
-export type ServerToClientAsync<Returns = any, Args... = ...any> = {
-	name: string,
-	type: "function",
-	onRequest: (self: ServerToClientAsync<Returns, Args...>, callback: (Args...) -> Returns | Promise<Returns>) -> (),
-	request: (self: ServerToClientAsync<Returns, Args...>, player: Player, Args...) -> Promise<Returns>,
-	destroy: (self: ServerToClientAsync<Returns, Args...>) -> (),
-}
+export type ServerToClientAsync<Returns = any, Args... = ...any> =
+	((player: Player, Args...) -> Promise<Returns>)
+	& ServerToClientAsyncNotCallable<Returns, Args...>
 
-export type ClientToServerAsync<Returns = any, Args... = ...any> = {
+export type ClientToServerAsync<Returns = any, Args... = ...any> =
+	((Args...) -> Promise<Returns>)
+	& ClientToServerAsyncNotCallable<Returns, Args...>
+
+export type AsyncRemoteNotCallable<Returns = any, Args... = ...any> =
+	ServerToClientAsyncNotCallable<Returns, Args...>
+	& ClientToServerAsyncNotCallable<Returns, Args...>
+
+type ServerToClientAsyncNotCallable<Returns = any, Args... = ...any> = {
 	name: string,
 	type: "function",
 	onRequest: (
-		self: ClientToServerAsync<Returns, Args...>,
+		self: ServerToClientAsyncNotCallable<Returns, Args...>,
+		callback: (Args...) -> Returns | Promise<Returns>
+	) -> (),
+	request: (self: ServerToClientAsyncNotCallable<Returns, Args...>, player: Player, Args...) -> Promise<Returns>,
+	destroy: (self: ServerToClientAsyncNotCallable<Returns, Args...>) -> (),
+}
+
+type ClientToServerAsyncNotCallable<Returns = any, Args... = ...any> = {
+	name: string,
+	type: "function",
+	onRequest: (
+		self: ClientToServerAsyncNotCallable<Returns, Args...>,
 		callback: (player: Player, Args...) -> Returns | Promise<Returns>
 	) -> (),
-	request: (self: ClientToServerAsync<Returns, Args...>, Args...) -> Promise<Returns>,
-	destroy: (self: ClientToServerAsync<Returns, Args...>) -> (),
+	request: (self: ClientToServerAsyncNotCallable<Returns, Args...>, Args...) -> Promise<Returns>,
+	destroy: (self: ClientToServerAsyncNotCallable<Returns, Args...>) -> (),
 }
 
 export type Remotes<Map = RemoteMap> = Map & {

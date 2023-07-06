@@ -164,4 +164,12 @@ return function()
 		expect(b).to.equal("b")
 		expect(c).to.equal("c")
 	end)
+
+	it("should be callable", function()
+		function instance.OnServerInvoke()
+			return "result"
+		end
+
+		expect(asyncRemote("test", 1):expect()).to.equal("result")
+	end)
 end
