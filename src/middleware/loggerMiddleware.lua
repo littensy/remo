@@ -1,7 +1,7 @@
 local types = require(script.Parent.Parent.types)
 local constants = require(script.Parent.Parent.constants)
 
-local SCOPE = constants.IS_SERVER and "server" or "client"
+local SCOPE = constants.IS_SERVER and "client → server" or "server → client"
 
 local function stringify(...)
 	local output = {}
@@ -32,11 +32,11 @@ end
 local loggerMiddleware: types.Middleware = function(next, remote)
 	return function(...)
 		if remote.type == "event" then
-			print(`\n🟡 (remote → {SCOPE}) {remote.name}\n\n`, stringify(...))
+			print(`\n🟡 ({SCOPE}) {remote.name}\n\n`, stringify(...))
 			return next(...)
 		end
 
-		print(`\n🟣 (async remote → {SCOPE}) {remote.name}\n`)
+		print(`\n🟣 ({SCOPE} async) {remote.name}\n`)
 		print(`Parameters\n`, stringify(...))
 
 		local results = table.pack(next(...))
