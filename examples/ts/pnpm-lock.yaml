@@ -5,6 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@rbxts/remo':
+    specifier: ^0.3.0
+    version: 0.3.0
+  '@rbxts/services':
+    specifier: ^1.5.1
+    version: 1.5.1
   '@rbxts/t':
     specifier: ^3.1.0
     version: 3.1.0
@@ -129,6 +135,14 @@ packages:
   /@rbxts/compiler-types@2.1.1-types.0:
     resolution: {integrity: sha512-wBRma9MgPbOxvCaQEUvraHLHAmLFGW9R6fT65+MBu3uCYM6vUNWj8l4dHRxgkUK8lnGYdGWxsr/sZFk8sdvwog==}
     dev: true
+
+  /@rbxts/remo@0.3.0:
+    resolution: {integrity: sha512-PtBd3DsH3sp/+ApG4eI/4wffshbH03OZculANQ6CERGql1IePdYtQUcw/+Ba2gxb9HkBBMbiK9x4EsAGx4oefw==}
+    dev: false
+
+  /@rbxts/services@1.5.1:
+    resolution: {integrity: sha512-SRtfIjga0K4YYSXRpK+eH3kcTq7ZXo9OHOt0jszaOOoEOIJloMGlyuRPqesPHyhveh2AMXAZr3TYbRMSD+u+kQ==}
+    dev: false
 
   /@rbxts/t@3.1.0:
     resolution: {integrity: sha512-ba/wfKYtAL6JWVhZNbhMnBZtzgGaTxttvfzxxpEcHDy0Qeaq0DF2Odo/zJ32Ajw961EMYkAMTnPXLLrLB/r+mw==}

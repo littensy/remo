@@ -10,16 +10,14 @@ type Remotes = Remo.Remotes<{
 	todosChanged: Remo.ServerToClient<{ string }>,
 }>
 
-local validate = {
-	todo = t.string,
-	todos = t.array(t.string :: any),
-}
+local todo = t.string
+local todoList = t.array(todo :: any)
 
 local remotes: Remotes = Remo.createRemotes({
-	addTodo = Remo.remote(validate.todo),
-	removeTodo = Remo.remote(validate.todo),
-	getTodos = Remo.remote().returns(validate.todos),
-	todosChanged = Remo.remote(validate.todos),
+	addTodo = Remo.remote(todo),
+	removeTodo = Remo.remote(todo),
+	getTodos = Remo.remote().returns(todoList),
+	todosChanged = Remo.remote(todoList),
 }, Remo.loggerMiddleware)
 
 return remotes
