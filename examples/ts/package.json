@@ -1,0 +1,28 @@
+{
+  "name": "ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "rbxtsc",
+    "watch": "rbxtsc -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@rbxts/compiler-types": "2.1.1-types.0",
+    "@rbxts/types": "^1.0.704",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "eslint": "^8.44.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-roblox-ts": "^0.0.35",
+    "prettier": "^2.8.8",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@rbxts/t": "^3.1.0"
+  }
+}
