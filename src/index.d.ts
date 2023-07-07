@@ -44,7 +44,7 @@ declare namespace Remo {
 	 * or both.
 	 * @template Args The arguments that the remote accepts.
 	 */
-	export function remote<Mode extends RemoteMode, Args extends unknown[]>(
+	export function remote<Mode extends RemoteMode, Args extends unknown[] = []>(
 		...validators: Partial<Validators<Args>>
 	): RemoteBuilder<(...args: Args) => void, Mode>;
 
@@ -298,6 +298,15 @@ declare namespace Remo {
 		 *
 		 * @client
 		 */
+		(...args: Args): void;
+		/**
+		 * Fires the remote for the server to process. Calls the listeners
+		 * connected to the same remote.
+		 *
+		 * Arguments are validated on the server before they are processed.
+		 *
+		 * @client
+		 */
 		fire(...args: Args): void;
 		/**
 		 * Connects a server-side listener to the remote. When a player fires
@@ -317,6 +326,15 @@ declare namespace Remo {
 	 * fired. It is fired by the server and events are processed by the client.
 	 */
 	export interface ClientRemote<Args extends unknown[]> extends BaseRemote<RemoteType.Event> {
+		/**
+		 * Fires the remote for the player to process. Calls the player's listeners
+		 * connected to the same remote.
+		 *
+		 * Arguments are validated on the client before they are processed.
+		 *
+		 * @server
+		 */
+		(player: Player, ...args: Args): void;
 		/**
 		 * Fires the remote for the player to process. Calls the player's listeners
 		 * connected to the same remote.
