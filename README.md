@@ -1,6 +1,60 @@
-# 🔌 Remo
+# ⚡️ Remo
 
-Remo is a simple remote event and function abstraction library for Roblox. Easily set up type-checked events and asynchronous functions that can be called from the client and server.
+Remo is a simple and type-safe remote library for Roblox.
+
+It's easy to set up events and asynchronous functions that are ready for use.
+
+---
+
+## 🔥 Quick Start
+
+Call `createRemotes` to initialize your remote objects.
+
+Declare a remote by calling `remote`, or create a namespace by calling `namespace`.
+
+```ts
+// TypeScript
+const remotes = createRemotes({
+	// An event processed on the client
+	event: remote<Client, [value: number]>(t.number),
+
+	// A function whose value is processed by the server
+	async: remote<Server, [value: number]>(t.number).returns<string>(t.string),
+
+	// An event fired to a client, with logging
+	logged: remote<Client, [value: number]>(t.number).middleware(loggerMiddleware),
+});
+
+remotes.event.connect((value) => print(value));
+
+remotes.async.request(123).then((value) => print(value));
+```
+
+```lua
+-- Luau
+type Remotes = {
+	-- An event processed on the client
+	event: Remo.ServerToClient<number>,
+
+	-- A function whose value is processed by the server
+	async: Remo.ClientToServer<string, (number)>,
+
+	-- An event fired to a client, with logging
+	logged: Remo.ServerToClient<number>,
+}
+
+local remotes: Remotes = Remo.createRemotes({
+	event = Remo.remote(t.number),
+	async = Remo.remote(t.number).returns(t.string),
+	logged = Remo.remote(t.number).middleware(loggerMiddleware),
+})
+
+remotes.event:connect(print)
+
+remotes.async:request(123):andThen(print)
+```
+
+---
 
 ## 📦 Installation
 
@@ -23,6 +77,8 @@ pnpm add @rbxts/remo
 Remo = "littensy/remo@1.1.0"
 ```
 
+---
+
 ## ✨ Features
 
 - 📚 Remote events and functions are fully type-checked and support Luau autocompletion.
@@ -32,6 +88,8 @@ Remo = "littensy/remo@1.1.0"
 - ⚛️ Declare your remotes in one place and use them anywhere.
 
 - 🛟 Safe to use in Hoarcekat or other environments outside of a running Roblox game.
+
+---
 
 ## 📖 Usage
 
@@ -70,6 +128,8 @@ local remotes: Remotes = Remo.createRemotes({
 	}),
 })
 ```
+
+---
 
 ### 🛟 Type safety
 
@@ -129,6 +189,8 @@ local remotes: Remotes = Remo.createRemotes({
 ```
 
 Defining two-way remotes is not recommended in Luau, as it would require function overloads that may affect intellisense.
+
+---
 
 ### 📡 Using remotes
 
@@ -196,6 +258,8 @@ end)
 ```
 
 Roblox-TS will automatically hide client- or server-only APIs based on whether you are using them on the client or on the server. However, this is not currently implemented in Luau, so take precautions to ensure you are calling `fire` or `connect` on the correct side.
+
+---
 
 ### ⛓️ Middleware
 
@@ -278,6 +342,8 @@ local remotes = Remo.createRemotes({
 
 Note that middleware is applied in the order it is defined. Additionally, middleware applied to all remotes will be applied _after_ middleware applied to a single remote.
 
+---
+
 ## 📚 API
 
 ### `createRemotes(schema)`
@@ -300,6 +366,8 @@ function createRemotes(schema: RemoteSchema, ...middleware: RemoMiddleware[]): R
 
 You can access your remotes through this object, and it also has a `destroy` method that can be used to destroy all of the remotes.
 
+---
+
 ### `remote(...validators?)`
 
 Declares a remote to be used in the remote schema.
@@ -320,6 +388,8 @@ function remote(...validators: Validator[]): RemoteBuilder;
 
 - `remote.middleware(...middleware)` - Applies the given middleware to this remote.
 
+---
+
 ### `namespace(schema)`
 
 Declares a namespace to be used in the remote schema.
@@ -335,6 +405,8 @@ function namespace(schema: RemoteSchema): RemoteNamespace;
 #### Returns
 
 `namespace` returns a RemoteNamespace, which declares a namespace of remotes. It does not have a public API.
+
+---
 
 ### `getSender(...)`
 
@@ -354,6 +426,8 @@ function getSender(...args: unknown[]): Player | undefined;
 
 `getSender` returns the player that sent the remote invocation, or `undefined` if the remote was not invoked by a player.
 
+---
+
 ### `loggerMiddleware`
 
 Creates detailed logs of the arguments and return values of a remote invocation.
@@ -361,6 +435,8 @@ Creates detailed logs of the arguments and return values of a remote invocation.
 ```ts
 const loggerMiddleware: RemoMiddleware;
 ```
+
+---
 
 ### `throttleMiddleware(options?)`
 
@@ -386,6 +462,8 @@ function throttleMiddleware(throttle?: number): RemoMiddleware;
 #### Returns
 
 `throttleMiddleware` returns a middleware function that throttles the remote with the given options.
+
+---
 
 ## 🪪 License
 
