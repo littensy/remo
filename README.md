@@ -53,8 +53,8 @@ const remotes = createRemotes({
 	event: remote<[value: number]>(t.number),
 	async: remote<[value: number]>(t.number).returns<string>(t.string),
 	namespace: namespace({
-		event2: remote<[value: number]>(t.number),
-		async2: remote<[value: number]>(t.number).returns<string>(t.string),
+		event: remote<[value: number]>(t.number),
+		async: remote<[value: number]>(t.number).returns<string>(t.string),
 	}),
 });
 ```
@@ -62,12 +62,12 @@ const remotes = createRemotes({
 ```lua
 -- Luau
 local remotes: Remotes = Remo.createRemotes({
-    event = Remo.remote(t.number),
-    async = Remo.remote(t.number).returns(t.string),
-    namespace = Remo.namespace({
-        event2 = Remo.remote(t.number),
-        async2 = Remo.remote(t.number).returns(t.string),
-    }),
+	event = Remo.remote(t.number),
+	async = Remo.remote(t.number).returns(t.string),
+	namespace = Remo.namespace({
+		event = Remo.remote(t.number),
+		async = Remo.remote(t.number).returns(t.string),
+	}),
 })
 ```
 
@@ -108,17 +108,23 @@ In Luau, for full type-checking in your editor, you will need to define a separa
 
 ```lua
 type Remotes = {
-    client: Remo.ServerToClient<number>,
-    server: Remo.ClientToServer<number>,
-    clientAsync: Remo.ServerToClientAsync<string, (number)>, -- unsafe
-    serverAsync: Remo.ClientToServerAsync<string, (number)>,
+	client: Remo.ServerToClient<number>,
+	server: Remo.ClientToServer<number>,
+	serverAsync: Remo.ClientToServerAsync<string, (number)>,
+	namespace: {
+		client: Remo.ServerToClient<number>,
+		server: Remo.ClientToServer<number>,
+	}
 }
 
 local remotes: Remotes = Remo.createRemotes({
-    client = Remo.remote(t.number),
-    server = Remo.remote(t.number),
-    clientAsync = Remo.remote(t.number).returns(t.string),
-    serverAsync = Remo.remote(t.number).returns(t.string),
+	client = Remo.remote(t.number),
+	server = Remo.remote(t.number),
+	serverAsync = Remo.remote(t.number).returns(t.string),
+	namespace = Remo.namespace({
+		client = Remo.remote(t.number),
+		server = Remo.remote(t.number),
+	}),
 })
 ```
 
@@ -146,12 +152,12 @@ To listen for events, use `connect` to connect a callback to the remote event. I
 ```lua
 -- client -> server
 local disconnect = remotes.event:connect(function(player, ...)
-    print(player, ...)
+	print(player, ...)
 end)
 
 -- server -> client
 local disconnect = remotes.event:connect(function(...)
-    print(...)
+	print(...)
 end)
 ```
 
@@ -164,12 +170,12 @@ Arguments are validated before the handler is called, and the return value is va
 ```lua
 -- client -> server async
 remotes.async:request(...):andThen(function(result)
-    print(result)
+	print(result)
 end)
 
 -- server -> client async
 remotes.async:request(player, ...):andThen(function(result)
-    print(result)
+	print(result)
 end)
 ```
 
@@ -180,12 +186,12 @@ The handler can return a value or a promise that resolves with a value. If the h
 ```lua
 -- client -> server async
 remotes.async:onRequest(function(player, ...)
-    return result
+	return result
 end)
 
 -- server -> client async
 remotes.async:onRequest(function(...)
-    return result
+	return result
 end)
 ```
 
@@ -198,6 +204,10 @@ Middleware can be used to intercept and modify arguments and return values befor
 #### 📦 Built-in middleware
 
 - `loggerMiddleware` creates detailed logs of the arguments and return value of a remote invocation.
+
+- `throttleMiddleware(options?)` prevents a remote from being invoked more than once every `throttle` seconds.
+  - If `trailing` is true, the last event will be fired again after the throttle period has passed. Does not apply to async functions.
+  - If an async remote is throttled, or it is not done processing the last request, the promise will resolve with the result of the last invocation. If there is no previous value available, the promise will reject.
 
 #### 🧱 Creating middleware
 
@@ -228,20 +238,20 @@ const loggerMiddleware: RemoMiddleware = (next, remote) => {
 ```lua
 -- Luau
 local loggerMiddleware: Remo.Middleware = function(next, remote)
-    return function(...)
-        if remote.type == "event" then
-            print(`{remote.name} fired with arguments:`, ...)
-            return next(...)
-        end
+	return function(...)
+		if remote.type == "event" then
+			print(`{remote.name} fired with arguments:`, ...)
+			return next(...)
+		end
 
-        print(`{remote.name} called with arguments:`, ...)
+		print(`{remote.name} called with arguments:`, ...)
 
-        local result = next(...)
+		local result = next(...)
 
-        print(`{remote.name} returned:`, result)
+		print(`{remote.name} returned:`, result)
 
-        return result
-    end
+		return result
+	end
 end
 ```
 
@@ -262,11 +272,120 @@ const remotes = createRemotes(
 ```lua
 -- Luau
 local remotes = Remo.createRemotes({
-    event = Remo.remote(t.number).middleware(loggerMiddleware),
+	event = Remo.remote(t.number).middleware(loggerMiddleware),
 }, ...middleware)
 ```
 
 Note that middleware is applied in the order it is defined. Additionally, middleware applied to all remotes will be applied _after_ middleware applied to a single remote.
+
+## 📚 API
+
+### `createRemotes(schema)`
+
+Creates a set of remotes from a schema.
+
+```ts
+function createRemotes(schema: RemoteSchema, ...middleware: RemoMiddleware[]): Remotes;
+```
+
+#### Parameters
+
+- `schema` - An object whose keys are the names of the remotes, and whose values are the remote declarations.
+
+- `...middleware` - An optional list of middleware to apply to all remotes.
+
+#### Returns
+
+`createRemotes` returns a Remotes object, which contains the remotes defined in the schema.
+
+You can access your remotes through this object, and it also has a `destroy` method that can be used to destroy all of the remotes.
+
+### `remote(...validators?)`
+
+Declares a remote to be used in the remote schema.
+
+```ts
+function remote(...validators: Validator[]): RemoteBuilder;
+```
+
+#### Parameters
+
+- `...validators` - A list of validators to call before processing the remote.
+
+#### Returns
+
+`remote` returns a RemoteBuilder, which can be used to define a remote. It has the following functions:
+
+- `remote.returns(validator)` - Declares that this is an async remote that returns a value of the given type.
+
+- `remote.middleware(...middleware)` - Applies the given middleware to this remote.
+
+### `namespace(schema)`
+
+Declares a namespace to be used in the remote schema.
+
+```ts
+function namespace(schema: RemoteSchema): RemoteNamespace;
+```
+
+#### Parameters
+
+- `schema` - An object whose keys are the names of the remotes, and whose values are the remote declarations.
+
+#### Returns
+
+`namespace` returns a RemoteNamespace, which declares a namespace of remotes. It does not have a public API.
+
+### `getSender(...)`
+
+Returns the player that sent the remote invocation using the arguments passed to the remote.
+
+This is used for finding the `player` argument from a middleware called on the server.
+
+```ts
+function getSender(...args: unknown[]): Player | undefined;
+```
+
+#### Parameters
+
+- `...args` - The arguments passed to the remote.
+
+#### Returns
+
+`getSender` returns the player that sent the remote invocation, or `undefined` if the remote was not invoked by a player.
+
+### `loggerMiddleware`
+
+Creates detailed logs of the arguments and return values of a remote invocation.
+
+```ts
+const loggerMiddleware: RemoMiddleware;
+```
+
+### `throttleMiddleware(options?)`
+
+Prevents a remote from being invoked more than once every `throttle` seconds.
+
+```ts
+interface ThrottleMiddlewareOptions {
+	throttle?: number;
+	trailing?: boolean;
+}
+
+function throttleMiddleware(options?: ThrottleMiddlewareOptions): RemoMiddleware;
+
+function throttleMiddleware(throttle?: number): RemoMiddleware;
+```
+
+#### Parameters
+
+- `options` - An optional object with the following properties:
+  - `throttle` - The number of seconds to throttle the remote for. Defaults to `0.1`.
+  - `trailing` - If `true`, the last event will be fired again after the throttle period has passed. Does not apply to async functions. Defaults to `false`.
+
+#### Returns
+
+`throttleMiddleware` returns a middleware function that throttles the remote with the given options.
 
 ## 🪪 License
 
