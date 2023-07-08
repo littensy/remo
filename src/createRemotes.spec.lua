@@ -9,10 +9,10 @@ return function()
 
 	local remotes: types.Remotes<{
 		event: types.ClientToServer<string, number>,
-		callback: types.ClientToServerAsync<string, (string, number)>,
+		callback: types.ServerAsync<(string, number), (string, nil)>,
 		namespace: {
 			event: types.ClientToServer<string, number>,
-			callback: types.ClientToServerAsync<string, (string, number)>,
+			callback: types.ServerAsync<(string, number), (string, nil)>,
 		},
 	}>
 
