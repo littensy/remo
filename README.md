@@ -146,12 +146,12 @@ To listen for events, use `connect` to connect a callback to the remote event. I
 ```lua
 -- client -> server
 local disconnect = remotes.event:connect(function(player, ...)
-    print(...)
+    print(player, ...)
 end)
 
 -- server -> client
 local disconnect = remotes.event:connect(function(...)
-    print(player, ...)
+    print(...)
 end)
 ```
 
@@ -169,7 +169,7 @@ end)
 
 -- server -> client async
 remotes.async:request(player, ...):andThen(function(result)
-    print(player, result)
+    print(result)
 end)
 ```
 
@@ -180,12 +180,12 @@ The handler can return a value or a promise that resolves with a value. If the h
 ```lua
 -- client -> server async
 remotes.async:onRequest(function(player, ...)
-    return ...
+    return result
 end)
 
 -- server -> client async
 remotes.async:onRequest(function(...)
-    return ...
+    return result
 end)
 ```
 
