@@ -4,7 +4,7 @@ local types = require(script.Parent.Parent.types)
 local compose = require(script.Parent.Parent.utils.compose)
 local instances = require(script.Parent.Parent.utils.instances)
 
-local function createEventRemote(name: string, builder: types.RemoteBuilder): types.Remote
+local function createRemote(name: string, builder: types.RemoteBuilder): types.Remote
 	local instance = instances.createRemoteEvent(name)
 	local connected = true
 
@@ -91,4 +91,4 @@ local function createEventRemote(name: string, builder: types.RemoteBuilder): ty
 	return remote
 end
 
-return createEventRemote
+return createRemote
