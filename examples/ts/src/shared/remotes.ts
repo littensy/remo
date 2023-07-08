@@ -13,10 +13,10 @@ export const remotes = createRemotes(
 		removeTodo: remote<Server, [name: string]>(todo),
 
 		// get all todos from the server
-		getTodos: remote<Server, []>().returns<string[]>(todoList),
+		getTodos: remote<Server>().returns<string[]>(todoList),
 
 		// send new todos to clients
-		todosChanged: remote<Client, [todos: string[]]>(),
+		todosChanged: remote<Client, [todos: string[]]>(todoList),
 	},
 	loggerMiddleware,
 );
