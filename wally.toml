@@ -1,7 +1,7 @@
 [package]
 name = "littensy/remo"
 description = "A simple remote library for Roblox"
-version = "0.3.0"
+version = "1.0.0"
 license = "MIT"
 registry = "https://github.com/UpliftGames/wally-index"
 realm = "shared"
