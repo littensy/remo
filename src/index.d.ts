@@ -70,9 +70,51 @@ declare namespace Remo {
 	export function createRemotes<T extends RemoteSchema>(schema: T, ...middleware: RemoteMiddleware[]): Remotes<T>;
 
 	/**
+	 * Returns the player who invoked the remote given the first argument passed
+	 * to the remote.
+	 */
+	export function getSender(...args: unknown[]): Player | undefined;
+
+	interface ThrottleMiddlewareOptions {
+		/**
+		 * The number of seconds to wait before the remote can be invoked again.
+		 *
+		 * @default 0.1
+		 */
+		readonly throttle?: number;
+		/**
+		 * Whether to fire the remote one more time after the throttle period has
+		 * passed. This only applies to events, and not async remotes.
+		 *
+		 * @default false
+		 */
+		readonly trailing?: boolean;
+	}
+
+	/**
 	 * Prints detailed messages to the console when the remote is fired or invoked.
 	 */
 	export const loggerMiddleware: RemoteMiddleware;
+
+	/**
+	 * Throttles the remote so that it can only be invoked once every `throttle`
+	 * seconds. If you want more control over the throttle behavior, pass an
+	 * `options` object instead.
+	 *
+	 * If applied to an async remote, the remote will try to resolve with the
+	 * previous result if it is invoked during the throttle period.
+	 */
+	export function throttleMiddleware(throttle: number): RemoteMiddleware;
+	/**
+	 * Throttles the remote so that it can only be invoked once every `throttle`
+	 * seconds. If `trailing` is true, the remote will fire one more time after
+	 * the throttle period has passed.
+	 *
+	 * If applied to an async remote, the remote will try to resolve with the
+	 * previous result if it is invoked during the throttle period. Otherwise,
+	 * the remote will reject with an error.
+	 */
+	export function throttleMiddleware(options?: ThrottleMiddlewareOptions): RemoteMiddleware;
 }
 
 declare namespace Remo {
@@ -150,6 +192,7 @@ declare namespace Remo {
 	 * Declares the mode and signature of a remote. The mode determines whether
 	 * the remote is processed on the client, the server, or both. The signature
 	 * determines the arguments and optional return value of the remote.
+	 *
 	 * @template Signature The function signature of the remote.
 	 */
 	export interface RemoteBuilder<Signature extends Callback = Callback, Mode extends RemoteMode = TwoWay> {
@@ -199,6 +242,7 @@ declare namespace Remo {
 	/**
 	 * A middleware function that can be applied to modify the behavior of a
 	 * remote. Returns a function that is called when the remote is invoked.
+	 *
 	 * @param next The next middleware function in the chain.
 	 * @param remote The remote that is being invoked.
 	 * @returns A function that is called when the remote is invoked.
