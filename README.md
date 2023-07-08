@@ -162,15 +162,15 @@ In Luau, for full type-checking in your editor, you will need to define a separa
 
 - `ServerToClient<Args...>`: A remote event that is fired by the server and processed by the client.
 
-- `ClientToServerAsync<Result, (Args...)>`: A remote function that is invoked by the client and processed by the server.
+- `ServerAsync<Args..., Returns...>`: A remote function that is invoked by the client and processed by the server.
 
-- ~~`ServerToClientAsync<Result, (Args...)>`~~: A remote function that is invoked by the server and processed by the client. Not recommended, as requesting values from the client is unsafe.
+- ~~`ClientAsync<Args..., Returns...>`~~: A remote function that is invoked by the server and processed by the client. Not recommended, as requesting values from the client is unsafe.
 
 ```lua
 type Remotes = {
 	client: Remo.ServerToClient<number>,
 	server: Remo.ClientToServer<number>,
-	serverAsync: Remo.ClientToServerAsync<string, (number)>,
+	serverAsync: Remo.ServerAsync<(number), (string)>,
 	namespace: {
 		client: Remo.ServerToClient<number>,
 		server: Remo.ClientToServer<number>,

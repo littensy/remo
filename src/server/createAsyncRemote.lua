@@ -11,7 +11,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 	local instance = instances.createRemoteFunction(name)
 	local connected = true
 
-	local function handler(...): any
+	local function handler(...): ...any
 		return
 	end
 
@@ -43,7 +43,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		end
 	end
 
-	local asyncRemoteNotCallable: types.AsyncRemoteNotCallable = {
+	local api: types.AsyncRemoteApi = {
 		name = name,
 		type = "function" :: "function",
 		onRequest = onRequest,
@@ -51,7 +51,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		destroy = destroy,
 	}
 
-	local asyncRemote = setmetatable(asyncRemoteNotCallable, {
+	local asyncRemote = setmetatable(api, {
 		__call = request,
 	}) :: types.AsyncRemote
 

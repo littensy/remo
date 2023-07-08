@@ -7,12 +7,13 @@ return function()
 	local builder = require(script.Parent.builder)
 	local mockRemotes = require(script.Parent.utils.mockRemotes)
 
+	-- TODO: remove 'nil' from type packs
 	local remotes: types.Remotes<{
 		event: types.ClientToServer<string, number>,
-		callback: types.ClientToServerAsync<string, (string, number)>,
+		callback: types.ServerAsync<(string, number), (string, nil)>,
 		namespace: {
 			event: types.ClientToServer<string, number>,
-			callback: types.ClientToServerAsync<string, (string, number)>,
+			callback: types.ServerAsync<(string, number), (string, nil)>,
 		},
 	}>
 

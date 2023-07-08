@@ -1,4 +1,3 @@
---!nonstrict
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local include = script:FindFirstAncestor("rbxts_include")
@@ -54,22 +53,22 @@ export type _Promise = {
 	now: (self: _Promise, rejectionValue: unknown) -> _Promise,
 }
 
-export type Promise<T = any> = {
-	timeout: (self: Promise<T>, seconds: number, rejectionValue: unknown) -> Promise<T>,
-	getStatus: (self: Promise<T>) -> PromiseStatus,
-	andThen: (self: Promise<T>, successHandler: (T) -> (), failureHandler: ((...any) -> ())?) -> _Promise,
-	catch: (self: Promise<T>, failureHandler: (any) -> ()) -> Promise<T>,
-	tap: (self: Promise<T>, successHandler: (T) -> ()) -> Promise<T>,
-	andThenCall: <U...>(self: Promise<T>, successHandler: (U...) -> (), U...) -> Promise<T>,
-	andThenReturn: (self: Promise<T>, value: any) -> _Promise,
-	cancel: (self: Promise<T>) -> (),
-	finally: (self: Promise<T>, callback: (status: PromiseStatus) -> ()) -> _Promise,
-	finallyCall: <U...>(self: Promise<T>, callback: (U...) -> (), U...) -> _Promise,
-	finallyReturn: (self: Promise<T>, value: any) -> _Promise,
-	awaitStatus: (self: Promise<T>) -> (PromiseStatus, T),
-	await: (self: Promise<T>) -> (boolean, T | unknown),
-	expect: (self: Promise<T>) -> T,
-	now: (self: Promise<T>, rejectionValue: unknown) -> Promise<T>,
+export type Promise<T... = ...any> = {
+	timeout: (self: Promise<T...>, seconds: number, rejectionValue: unknown) -> Promise<T...>,
+	getStatus: (self: Promise<T...>) -> PromiseStatus,
+	andThen: (self: Promise<T...>, successHandler: (T...) -> (), failureHandler: ((...any) -> ())?) -> _Promise,
+	catch: (self: Promise<T...>, failureHandler: (any) -> ()) -> Promise<T...>,
+	tap: (self: Promise<T...>, successHandler: (T...) -> ()) -> Promise<T...>,
+	andThenCall: <U...>(self: Promise<T...>, successHandler: (U...) -> (), U...) -> Promise<T...>,
+	andThenReturn: (self: Promise<T...>, value: any) -> _Promise,
+	cancel: (self: Promise<T...>) -> (),
+	finally: (self: Promise<T...>, callback: (status: PromiseStatus) -> ()) -> _Promise,
+	finallyCall: <U...>(self: Promise<T...>, callback: (U...) -> (), U...) -> _Promise,
+	finallyReturn: (self: Promise<T...>, value: any) -> _Promise,
+	awaitStatus: (self: Promise<T...>) -> (PromiseStatus, T...),
+	await: (self: Promise<T...>) -> (boolean, T...),
+	expect: (self: Promise<T...>) -> T...,
+	now: (self: Promise<T...>, rejectionValue: unknown) -> Promise<T...>,
 }
 
 if include and include:FindFirstChild("Promise") then
