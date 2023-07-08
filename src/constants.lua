@@ -8,4 +8,5 @@ return {
 	IS_EDIT = IS_EDIT,
 	IS_CLIENT = IS_CLIENT,
 	IS_SERVER = IS_SERVER,
+	IS_TEST = false,
 }
