@@ -11,8 +11,8 @@ return function()
 		event: types.ClientToServer<string, number>,
 		callback: types.ClientToServerAsync<string, (string, number)>,
 		namespace: {
-			namespaceEvent: types.ClientToServer<string, number>,
-			namespaceCallback: types.ClientToServerAsync<string, (string, number)>,
+			event: types.ClientToServer<string, number>,
+			callback: types.ClientToServerAsync<string, (string, number)>,
 		},
 	}>
 
@@ -22,8 +22,8 @@ return function()
 			event = builder.remote(t.string, t.number),
 			callback = builder.remote(t.string, t.number).returns(t.string),
 			namespace = builder.namespace({
-				namespaceEvent = builder.remote(t.string, t.number),
-				namespaceCallback = builder.remote(t.string, t.number).returns(t.string),
+				event = builder.remote(t.string, t.number),
+				callback = builder.remote(t.string, t.number).returns(t.string),
 			}),
 		})
 	end)
@@ -40,10 +40,10 @@ return function()
 	end)
 
 	it("should create namespaced remotes", function()
-		expect(remotes.namespace.namespaceEvent).to.be.ok()
-		expect(remotes.namespace.namespaceCallback).to.be.ok()
-		expect(mockRemotes.getMockRemoteEvent("namespaceEvent")).to.be.ok()
-		expect(mockRemotes.getMockRemoteFunction("namespaceCallback")).to.be.ok()
+		expect(remotes.namespace.event).to.be.ok()
+		expect(remotes.namespace.callback).to.be.ok()
+		expect(mockRemotes.getMockRemoteEvent("namespace.event")).to.be.ok()
+		expect(mockRemotes.getMockRemoteFunction("namespace.callback")).to.be.ok()
 	end)
 
 	it("should fire a top-level event", function()
@@ -63,11 +63,11 @@ return function()
 	it("should fire a namespaced event", function()
 		local arg1, arg2, arg3
 
-		remotes.namespace.namespaceEvent:connect(function(...)
+		remotes.namespace.event:connect(function(...)
 			arg1, arg2, arg3 = ...
 		end)
 
-		mockRemotes.createMockRemoteEvent("namespaceEvent"):FireServer("test", 1)
+		mockRemotes.createMockRemoteEvent("namespace.event"):FireServer("test", 1)
 
 		expect(arg1).to.be.ok() -- player
 		expect(arg2).to.equal("test")
@@ -93,12 +93,12 @@ return function()
 	it("should invoke a namespaced callback", function()
 		local arg1, arg2, arg3
 
-		remotes.namespace.namespaceCallback:onRequest(function(...)
+		remotes.namespace.callback:onRequest(function(...)
 			arg1, arg2, arg3 = ...
 			return "test"
 		end)
 
-		local result = mockRemotes.createMockRemoteFunction("namespaceCallback"):InvokeServer("test", 1)
+		local result = mockRemotes.createMockRemoteFunction("namespace.callback"):InvokeServer("test", 1)
 
 		expect(arg1).to.be.ok() -- player
 		expect(arg2).to.equal("test")
@@ -127,8 +127,8 @@ return function()
 			event = builder.remote(t.string, t.number),
 			callback = builder.remote(t.string, t.number).returns(t.string),
 			namespace = builder.namespace({
-				namespaceEvent = builder.remote(t.string, t.number),
-				namespaceCallback = builder.remote(t.string, t.number).returns(t.string),
+				event = builder.remote(t.string, t.number),
+				callback = builder.remote(t.string, t.number).returns(t.string),
 			}),
 		}, middleware(1), middleware(2), middleware(3))
 
@@ -158,6 +158,6 @@ return function()
 		end
 
 		test("event", "callback")
-		test("namespaceEvent", "namespaceCallback")
+		test("namespace.event", "namespace.callback")
 	end)
 end
