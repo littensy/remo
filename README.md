@@ -36,8 +36,8 @@ type Remotes = {
 	-- An event processed on the client
 	event: Remo.ServerToClient<number>,
 
-	-- A function whose value is processed by the server
-	async: Remo.ClientToServerAsync<string, (number)>,
+	-- A function whose result, a string, is processed on the server
+	async: Remo.ServerAsync<(number), (string)>,
 
 	-- An event fired to a client, with logging
 	logged: Remo.ServerToClient<number>,
