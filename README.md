@@ -6,6 +6,8 @@ Remo is a simple remote event and function abstraction library for Roblox. Easil
 
 ### Roblox-TS
 
+[Take me to the NPM package →](https://www.npmjs.com/package/@rbxts/remo)
+
 ```bash
 npm install @rbxts/remo
 yarn add @rbxts/remo
@@ -13,6 +15,8 @@ pnpm add @rbxts/remo
 ```
 
 ### Wally
+
+[Take me to the Wally package →](https://wally.run/package/littensy/remo)
 
 ```toml
 [dependencies]
@@ -153,7 +157,7 @@ end)
 
 #### 🟣 Async functions
 
-Similar to RemoteFunctions, `request` is used to invoke a remote function. It sends the given arguments over the remote function to be processed on the other side, and returns a promise that resolves with the return value of the function.
+Similar to InvokeClient and InvokeServer, `request` is used to invoke a remote function. It sends the given arguments over the remote function to be processed on the other side, and returns a promise that resolves with the return value of the function.
 
 Arguments are validated before the handler is called, and the return value is validated before the promise is resolved.
 
@@ -247,16 +251,19 @@ Middleware may be applied to a single remote, or to all remotes.
 
 ```ts
 // TypeScript
-const remotes = createRemotes({
-    event: remote(t.number).middleware(loggerMiddleware),
-}, ...);
+const remotes = createRemotes(
+	{
+		event: remote(t.number).middleware(loggerMiddleware),
+	},
+	...middleware,
+);
 ```
 
 ```lua
 -- Luau
 local remotes = Remo.createRemotes({
     event = Remo.remote(t.number).middleware(loggerMiddleware),
-}, ...)
+}, ...middleware)
 ```
 
 Note that middleware is applied in the order it is defined. Additionally, middleware applied to all remotes will be applied _after_ middleware applied to a single remote.
