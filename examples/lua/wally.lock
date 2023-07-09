@@ -9,7 +9,7 @@ dependencies = []
 
 [[package]]
 name = "littensy/remo"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [["Promise", "evaera/promise@4.0.0"]]
 
 [[package]]
@@ -20,4 +20,4 @@ dependencies = []
 [[package]]
 name = "richerd/lua"
 version = "0.1.0"
-dependencies = [["Promise", "evaera/promise@4.0.0"], ["Remo", "littensy/remo@1.0.0"], ["t", "osyrisrblx/t@3.0.0"]]
+dependencies = [["Promise", "evaera/promise@4.0.0"], ["Remo", "littensy/remo@1.1.0"], ["t", "osyrisrblx/t@3.0.0"]]
