@@ -135,6 +135,8 @@ declare namespace Remo {
 	/**
 	 * This remote will be processed by both the client and the server and can be
 	 * invoked by either.
+	 *
+	 * @deprecated As of 1.2, prefer `Server` or `Client` instead.
 	 */
 	export interface TwoWay {
 		readonly __brand: unique symbol;
@@ -164,12 +166,12 @@ declare namespace Remo {
 					? ServerRemote<Args>
 					: Mode extends Client
 					? ClientRemote<Args>
-					: Remote<Args>
+					: ServerRemote<Args> | ClientRemote<Args>
 				: Mode extends Server
 				? ServerAsyncRemote<Args, Returns>
 				: Mode extends Client
 				? ClientAsyncRemote<Args, Returns>
-				: AsyncRemote<Args, Returns>
+				: ServerAsyncRemote<Args, Returns> | ClientAsyncRemote<Args, Returns>
 			: never
 		: never;
 
@@ -279,12 +281,16 @@ declare namespace Remo {
 	}
 
 	export type AnyRemote<Args extends unknown[] = unknown[], Returns = unknown> =
-		| Remote<Args>
-		| AsyncRemote<Args, Returns>;
+		| ServerRemote<Args>
+		| ClientRemote<Args>
+		| ServerAsyncRemote<Args, Returns>
+		| ClientAsyncRemote<Args, Returns>;
 
 	/**
 	 * A two-way remote event that runs the connected listeners when it is fired.
 	 * It can be fired and connected to on both the client and the server.
+	 *
+	 * @deprecated Use a client or server remote instead.
 	 */
 	export interface Remote<Args extends unknown[] = unknown[]> extends ServerRemote<Args>, ClientRemote<Args> {
 		/**
@@ -431,6 +437,8 @@ declare namespace Remo {
 	/**
 	 * A two-way remote function that runs the handler when it is invoked. It can
 	 * be invoked and processed on both the client and the server.
+	 *
+	 * @deprecated Use a client or server async remote instead.
 	 */
 	export interface AsyncRemote<Args extends unknown[] = unknown[], Returns = unknown>
 		extends ServerAsyncRemote<Args, Returns>,
