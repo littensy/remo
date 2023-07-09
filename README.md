@@ -97,22 +97,22 @@ See the [examples](examples) folder for more detailed examples.
 
 ### 🔌 Creating remotes
 
-`createRemotes` is used to create a set of remotes. It receives the remote schema, which is an object that maps remote names to their definitions.
+`createRemotes` is used to create a set of remotes. It receives the remote schema, which is an object that maps remote names to their definitions created by `remote`:
 
-- `remote<Args>(...validators?)` creates a remote event with the given argument types. If validators are provided, they will be used to validate the arguments passed to the event.
+- `remote<Mode, Args>(...validators?)` creates a remote event with the given argument types. If validators are provided, they will be used to validate the arguments passed to the event.
 
-- `remote().returns<Result>(...validators?)` creates a remote function with the given argument and return types. If validators are provided, they will be asserted against the arguments passed to the function and the return value of the function.
+- `remote(...).returns<Result>(...validators?)` creates a remote function with the given argument and return types. If validators are provided, the return value will be validated before the promise is resolved.
 
 - `namespace(schema)` creates a nested namespace of remotes.
 
 ```ts
 // TypeScript
 const remotes = createRemotes({
-	event: remote<[value: number]>(t.number),
-	async: remote<[value: number]>(t.number).returns<string>(t.string),
+	event: remote<Client, [value: number]>(t.number),
+	async: remote<Server, [value: number]>(t.number).returns<string>(t.string),
 	namespace: namespace({
-		event: remote<[value: number]>(t.number),
-		async: remote<[value: number]>(t.number).returns<string>(t.string),
+		event: remote<Client, [value: number]>(t.number),
+		async: remote<Server, [value: number]>(t.number).returns<string>(t.string),
 	}),
 });
 ```
@@ -137,9 +137,7 @@ local remotes: Remotes = Remo.createRemotes({
 
 In TypeScript, [`t`](https://github.com/osyrisrblx/t) is recommended to ensure remotes can only be called with the correct arguments, but it is optional.
 
-To further narrow your types, `remote` receives an optional `Mode` generic that can be used to specify whether the remote is processed by the client or the server. By default, remotes are `TwoWay`, meaning they can be called from both the client and the server.
-
-This is mainly for narrowing types, as this does not change the behavior of the remote.
+`remote` receives either a `Client` or `Server` flag that is used to specify whether the remote is processed by the client or the server.
 
 ```ts
 const remotes = createRemotes({
@@ -148,9 +146,6 @@ const remotes = createRemotes({
 
 	// event processed on the server and fired by the client
 	server: remote<Server, [value: number]>(t.number),
-
-	// event processed on both the client and server
-	twoWay: remote<TwoWay, [value: number]>(t.number),
 });
 ```
 
@@ -327,7 +322,7 @@ Middleware may be applied to a single remote, or to all remotes.
 // TypeScript
 const remotes = createRemotes(
 	{
-		event: remote(t.number).middleware(loggerMiddleware),
+		event: remote<Client>(t.number).middleware(loggerMiddleware),
 	},
 	...middleware,
 );
@@ -373,7 +368,7 @@ You can access your remotes through this object, and it also has a `destroy` met
 Declares a remote to be used in the remote schema.
 
 ```ts
-function remote(...validators: Validator[]): RemoteBuilder;
+function remote<Mode, Args>(...validators: Validator[]): RemoteBuilder;
 ```
 
 #### Parameters
