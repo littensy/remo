@@ -4,7 +4,8 @@
 	"description": "A simple remote library for Roblox",
 	"main": "src/init.lua",
 	"scripts": {
-		"test": "sh scripts/test.sh"
+		"test": "sh scripts/test.sh",
+		"analyze": "sh scripts/analyze.sh"
 	},
 	"keywords": [
 		"roblox",
