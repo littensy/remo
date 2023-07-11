@@ -350,6 +350,11 @@ declare namespace Remo {
 		 */
 		(...args: Args): void;
 		/**
+		 * Provides an interface to subscribe to or intercept this remote's own
+		 * outgoing events. Useful for mocking a client or server's response.
+		 */
+		readonly test: RemoteTester<Args>;
+		/**
 		 * Fires the remote for the server to process. Calls the listeners
 		 * connected to the same remote.
 		 *
@@ -385,6 +390,11 @@ declare namespace Remo {
 		 * @server
 		 */
 		(player: Player, ...args: Args): void;
+		/**
+		 * Provides an interface to subscribe to or intercept this remote's own
+		 * outgoing events. Useful for mocking a client or server's response.
+		 */
+		readonly test: RemoteTester<Args>;
 		/**
 		 * Fires the remote for the player to process. Calls the player's listeners
 		 * connected to the same remote.
@@ -504,6 +514,11 @@ declare namespace Remo {
 		 */
 		(...args: Args): Promise<Returns>;
 		/**
+		 * Provides an interface to mock a response to a remote request. Useful for
+		 * intercepting a request to the server or client.
+		 */
+		readonly test: AsyncRemoteTester<Args, Returns>;
+		/**
 		 * Sends a request for the server to process. Returns a Promise that resolves
 		 * with the return value of the server handler.
 		 *
@@ -542,6 +557,11 @@ declare namespace Remo {
 		 */
 		(player: Player, ...args: Args): Promise<Returns>;
 		/**
+		 * Provides an interface to mock a response to a remote request. Useful for
+		 * intercepting a request to the server or client.
+		 */
+		readonly test: AsyncRemoteTester<Args, Returns>;
+		/**
 		 * Sends a request for a player to process. Returns a Promise that resolves
 		 * with the value returned by the handler.
 		 *
@@ -564,5 +584,53 @@ declare namespace Remo {
 		 * @deprecated Requesting values from players is unsafe.
 		 */
 		onRequest(handler: (...args: Args) => Promise<Returns> | Returns): void;
+	}
+
+	/**
+	 * Provides an interface to subscribe to or intercept this remote's own
+	 * outgoing events. Useful for mocking a client or server's response.
+	 */
+	export interface RemoteTester<Args extends unknown[]> {
+		/**
+		 * Subscribes to an outgoing event originating from this side of the client/
+		 * server boundary. The listener will be invoked with the arguments passed
+		 * to `remote.fire`, minus any player argument.
+		 *
+		 * This is _not_ a replacement for `connect`, and will not intercept events
+		 * sent by the other side of the client/server boundary.
+		 *
+		 * **Note:** Remember to clean up your listeners when you are done testing!
+		 */
+		onFire(listener: (...args: Args) => void): Cleanup;
+		/**
+		 * Disconnects all listeners from this test remote.
+		 */
+		disconnectAll(): void;
+	}
+
+	/**
+	 * Provides an interface to mock a response to a remote request. Useful for
+	 * intercepting a request to the server or client.
+	 */
+	export interface AsyncRemoteTester<Args extends unknown[], Returns> {
+		/**
+		 * Forces `request` to call this handler instead of the handler registered
+		 * by the recipient. The handler will be invoked with the arguments passed
+		 * to `remote.request`, minus any player argument.
+		 *
+		 * This is _not_ a replacement for `onRequest`, and will not intercept
+		 * requests sent by the other side of the client/server boundary.
+		 *
+		 * **Note:** Remember to call `disconnectAll` when you are done testing!
+		 */
+		handleRequest(handler: (...args: Args) => Promise<Returns> | Returns): void;
+		/**
+		 * Returns whether this remote has a handler registered.
+		 */
+		hasRequestHandler(): boolean;
+		/**
+		 * Removes the handler registered by `handleRequest`.
+		 */
+		disconnectAll(): void;
 	}
 }
