@@ -47,6 +47,7 @@ export type RemoteMap = {
 export type ClientToServer<Args... = ...any> = {
 	name: string,
 	type: "event",
+	test: TestRemote<Args...>,
 	connect: (self: ClientToServer<Args...>, callback: (player: Player, Args...) -> ()) -> Cleanup,
 	fire: (self: ClientToServer<Args...>, Args...) -> (),
 	destroy: (self: ClientToServer<Args...>) -> (),
@@ -55,6 +56,7 @@ export type ClientToServer<Args... = ...any> = {
 export type ServerToClient<Args... = ...any> = {
 	name: string,
 	type: "event",
+	test: TestRemote<Args...>,
 	connect: (self: ServerToClient<Args...>, callback: (Args...) -> ()) -> Cleanup,
 	fire: (self: ServerToClient<Args...>, player: Player, Args...) -> (),
 	firePlayers: (self: ServerToClient<Args...>, players: { Player }, Args...) -> (),
@@ -82,6 +84,7 @@ export type AsyncRemoteApi<Args... = ...any, Returns... = ...any> =
 export type ServerAsyncApi<Args..., Returns...> = {
 	name: string,
 	type: "function",
+	test: TestAsyncRemote<Args..., Returns...>,
 	onRequest: (
 		self: ServerAsyncApi<Args..., Returns...>,
 		callback: ((player: Player, Args...) -> Returns...) | (player: Player, Args...) -> Promise<Returns...>
@@ -93,12 +96,29 @@ export type ServerAsyncApi<Args..., Returns...> = {
 export type ClientAsyncApi<Args..., Returns...> = {
 	name: string,
 	type: "function",
+	test: TestAsyncRemote<Args..., Returns...>,
 	onRequest: (
 		self: ClientAsyncApi<Args..., Returns...>,
 		callback: ((Args...) -> Returns...) | (Args...) -> Promise<Returns...>
 	) -> (),
 	request: (self: ClientAsyncApi<Args..., Returns...>, Args...) -> Promise<Returns...>,
 	destroy: (self: ClientAsyncApi<Args..., Returns...>) -> (),
+}
+
+export type TestRemote<Args... = ...any> = {
+	_fire: (self: TestRemote<Args...>, Args...) -> (),
+	onFire: (self: TestRemote<Args...>, callback: (Args...) -> ()) -> Cleanup,
+	disconnectAll: (self: TestRemote<Args...>) -> (),
+}
+
+export type TestAsyncRemote<Args... = ...any, Returns... = ...any> = {
+	_request: (self: TestAsyncRemote<Args..., Returns...>, Args...) -> Returns...,
+	handleRequest: (
+		self: TestAsyncRemote<Args..., Returns...>,
+		callback: ((Args...) -> Returns...) | (Args...) -> Promise<Returns...>
+	) -> (),
+	hasRequestHandler: (self: TestAsyncRemote<Args..., Returns...>) -> boolean,
+	disconnectAll: (self: TestAsyncRemote<Args..., Returns...>) -> (),
 }
 
 return nil

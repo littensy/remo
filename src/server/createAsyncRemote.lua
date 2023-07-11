@@ -4,11 +4,13 @@ local types = require(script.Parent.Parent.types)
 local compose = require(script.Parent.Parent.utils.compose)
 local instances = require(script.Parent.Parent.utils.instances)
 local unwrap = require(script.Parent.Parent.utils.unwrap)
+local testRemote = require(script.Parent.Parent.utils.testRemote)
 
 local function createAsyncRemote(name: string, builder: types.RemoteBuilder): types.AsyncRemote
 	assert(builder.metadata.returns, `Missing return value validator for async remote '{name}'`)
 
 	local instance = instances.createRemoteFunction(name)
+	local test = testRemote.createTestAsyncRemote()
 	local connected = true
 
 	local function handler(...): ...any
@@ -24,7 +26,9 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		assert(connected, `Cannot use destroyed async remote '{name}'`)
 
 		return Promise.try(function(...)
-			local response = table.pack(instance:InvokeClient(player, ...))
+			local response = if test:hasRequestHandler()
+				then table.pack(test:_request(...)) :: never
+				else table.pack(instance:InvokeClient(player, ...))
 
 			for index, validator in builder.metadata.returns do
 				local value = response[index]
@@ -46,6 +50,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 	local api: types.AsyncRemoteApi = {
 		name = name,
 		type = "function" :: "function",
+		test = test,
 		onRequest = onRequest,
 		request = request,
 		destroy = destroy,

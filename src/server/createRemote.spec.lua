@@ -109,4 +109,30 @@ return function()
 		expect(arg1).to.equal("intercepted")
 		expect(arg2).to.equal(2)
 	end)
+
+	it("should fire the test listeners", function()
+		local test1, test2, arg1, arg2
+
+		remote.test:onFire(function(...)
+			test1, test2 = ...
+		end)
+
+		instance.OnClientEvent:Connect(function(...)
+			arg1, arg2 = ...
+		end)
+
+		remote:fireAll("test", 1)
+
+		expect(test1).to.equal(arg1)
+		expect(test2).to.equal(arg2)
+
+		test1, test2, arg1, arg2 = nil
+		remote.test:disconnectAll()
+		remote:fireAll("test", 1)
+
+		expect(test1).to.never.be.ok()
+		expect(test2).to.never.be.ok()
+		expect(arg1).to.equal("test")
+		expect(arg2).to.equal(1)
+	end)
 end

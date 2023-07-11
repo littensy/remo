@@ -170,4 +170,23 @@ return function()
 
 		expect(asyncRemote(player, "test", 1):expect()).to.equal("result")
 	end)
+
+	it("should invoke the test handler", function()
+		local arg1, arg2
+
+		asyncRemote.test:handleRequest(function(...)
+			arg1, arg2 = ...
+			return "result"
+		end)
+
+		expect(asyncRemote:request(player, "test", 1):expect()).to.equal("result")
+		expect(arg1).to.equal("test")
+		expect(arg2).to.equal(1)
+
+		asyncRemote.test:disconnectAll()
+
+		expect(function()
+			asyncRemote:request("test", 1):expect()
+		end).to.throw()
+	end)
 end
