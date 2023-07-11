@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@rbxts/remo':
-    specifier: ^1.2.0
-    version: 1.2.0
+    specifier: ^1.2.1
+    version: 1.2.1
   '@rbxts/services':
     specifier: ^1.5.1
     version: 1.5.1
@@ -136,8 +136,8 @@ packages:
     resolution: {integrity: sha512-wBRma9MgPbOxvCaQEUvraHLHAmLFGW9R6fT65+MBu3uCYM6vUNWj8l4dHRxgkUK8lnGYdGWxsr/sZFk8sdvwog==}
     dev: true
 
-  /@rbxts/remo@1.2.0:
-    resolution: {integrity: sha512-OPXL/xH+3j28Z+huoip4XqBrDS6CIJ6+AT9E0OE5zA9tBUzB7Xu/w6Riq9Z7E2ZId+J3BtfjAXp4iA1hT+Cr6Q==}
+  /@rbxts/remo@1.2.1:
+    resolution: {integrity: sha512-S/eh9zr7fysgsR5Ft5nnO2LgueegMduXOoCVv6l1Flg2Vdbhs1sgTzuSJsJAbxMpvfTWLml9063DzHqP1N0T6g==}
     dev: false
 
   /@rbxts/services@1.5.1:
