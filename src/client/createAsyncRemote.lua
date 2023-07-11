@@ -2,8 +2,10 @@ local types = require(script.Parent.Parent.types)
 local compose = require(script.Parent.Parent.utils.compose)
 local instances = require(script.Parent.Parent.utils.instances)
 local unwrap = require(script.Parent.Parent.utils.unwrap)
+local testRemote = require(script.Parent.Parent.utils.testRemote)
 
 local function createAsyncRemote(name: string, builder: types.RemoteBuilder): types.AsyncRemote
+	local test = testRemote.createTestAsyncRemote()
 	local connected = true
 
 	local function handler(...): any
@@ -21,7 +23,9 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		local arguments = table.pack(...)
 
 		return instances.promiseRemoteFunction(name):andThen(function(instance)
-			local response = table.pack(instance:InvokeServer(table.unpack(arguments, 1, arguments.n)))
+			local response = if test:hasRequestHandler()
+				then table.pack(test:_request(table.unpack(arguments, 1, arguments.n))) :: never
+				else table.pack(instance:InvokeServer(table.unpack(arguments, 1, arguments.n)))
 
 			for index, validator in builder.metadata.returns do
 				local value = response[index]
@@ -44,6 +48,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 	local api: types.AsyncRemoteApi = {
 		name = name,
 		type = "function" :: "function",
+		test = test,
 		onRequest = onRequest,
 		request = request,
 		destroy = destroy,

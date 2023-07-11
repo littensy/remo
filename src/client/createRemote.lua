@@ -1,9 +1,11 @@
 local types = require(script.Parent.Parent.types)
 local compose = require(script.Parent.Parent.utils.compose)
 local instances = require(script.Parent.Parent.utils.instances)
+local testRemote = require(script.Parent.Parent.utils.testRemote)
 
 local function createRemote(name: string, builder: types.RemoteBuilder): types.Remote
 	local connection: RBXScriptConnection?
+	local test = testRemote.createTestRemote()
 	local connected = true
 
 	local listeners: { (...any) -> () } = {}
@@ -32,6 +34,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 
 		instances.promiseRemoteEvent(name):andThen(function(instance)
 			instance:FireServer(table.unpack(arguments, 1, arguments.n))
+			test:_fire(table.unpack(arguments, 1, arguments.n))
 		end, function(error): ()
 			warn(`Failed to fire remote '{name}': {error}`)
 		end)
@@ -55,6 +58,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 	local remote: types.Remote = {
 		name = name,
 		type = "event" :: "event",
+		test = test,
 		connect = connect,
 		fire = fire,
 		fireAll = noop,
