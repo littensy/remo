@@ -341,15 +341,6 @@ declare namespace Remo {
 	 */
 	export interface ServerRemote<Args extends unknown[]> extends BaseRemote<RemoteType.Event> {
 		/**
-		 * Fires the remote for the server to process. Calls the listeners
-		 * connected to the same remote.
-		 *
-		 * Arguments are validated on the server before they are processed.
-		 *
-		 * @client
-		 */
-		(...args: Args): void;
-		/**
 		 * Provides an interface to subscribe to or intercept this remote's own
 		 * outgoing events. Useful for mocking a client or server's response.
 		 */
@@ -381,15 +372,6 @@ declare namespace Remo {
 	 * fired. It is fired by the server and events are processed by the client.
 	 */
 	export interface ClientRemote<Args extends unknown[]> extends BaseRemote<RemoteType.Event> {
-		/**
-		 * Fires the remote for the player to process. Calls the player's listeners
-		 * connected to the same remote.
-		 *
-		 * Arguments are validated on the client before they are processed.
-		 *
-		 * @server
-		 */
-		(player: Player, ...args: Args): void;
 		/**
 		 * Provides an interface to subscribe to or intercept this remote's own
 		 * outgoing events. Useful for mocking a client or server's response.
