@@ -161,7 +161,7 @@ declare namespace Remo {
 
 	type InferRemoteFromBuilder<T extends RemoteBuilder> = T extends RemoteBuilder<infer Signature, infer Mode>
 		? Signature extends (...args: infer Args) => infer Returns
-			? Returns extends void
+			? [Returns] extends [void]
 				? Mode extends Server
 					? ServerRemote<Args>
 					: Mode extends Client
