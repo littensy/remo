@@ -54,7 +54,7 @@ local function throttleMiddleware(options: ThrottleMiddlewareOptions?): types.Mi
 			cache[senderId] = table.pack(...)
 
 			if timeoutId then
-				if not constants.IS_TEST then
+				if not constants.IS_TEST and constants.IS_STUDIO then
 					warn(`🔴 throttled remote '{remote.name}' fired by '{senderId}'`)
 				end
 				return
