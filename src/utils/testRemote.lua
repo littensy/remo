@@ -1,12 +1,21 @@
 local types = require(script.Parent.Parent.types)
+local getSender = require(script.Parent.Parent.getSender)
+
+local function noop() end
 
 local function createTestRemote(): types.TestRemote
 	local listeners: { (...any) -> () } = {}
 	local nextListenerId = 0
 
-	local function fire(self, ...)
+	local function fire(self, first, ...)
+		local shouldOmitPlayer = getSender(first)
+
 		for _, listener in listeners do
-			listener(...)
+			if shouldOmitPlayer then
+				listener(...)
+			else
+				listener(first, ...)
+			end
 		end
 	end
 
@@ -34,12 +43,10 @@ local function createTestRemote(): types.TestRemote
 end
 
 local function createTestAsyncRemote(): types.TestAsyncRemote
-	local function noop() end
+	local handler: (...any) -> () = noop
 
-	local handler = noop
-
-	local function request(self, ...)
-		return handler(...)
+	local function request(self, first, ...)
+		return if getSender(first) then handler(...) else handler(first, ...)
 	end
 
 	local function handleRequest(self, newHandler)
