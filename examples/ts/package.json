@@ -23,7 +23,7 @@
 		"typescript": "^5.2.2"
 	},
 	"dependencies": {
-		"@rbxts/remo": "^1.2.3",
+		"@rbxts/remo": "^1.2.4",
 		"@rbxts/services": "^1.5.1",
 		"@rbxts/t": "^3.1.0"
 	}
