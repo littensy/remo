@@ -27,11 +27,9 @@ export type AsyncRemote<Args... = ...any, Returns... = ...any> = types.AsyncRemo
 export type ServerAsync<Args... = ...any, Returns... = ...any> = types.ServerAsync<Args..., Returns...>
 export type ClientAsync<Args... = ...any, Returns... = ...any> = types.ClientAsync<Args..., Returns...>
 
--- stylua: ignore
 --- @deprecated 1.2, use `ServerAsync` instead.
 export type ClientToServerAsync<Returns = any, Args... = ...any> = types.ServerAsync<Args..., (Returns)>
 
--- stylua: ignore
 --- @deprecated 1.2, use `ClientAsync` instead.
 export type ServerToClientAsync<Returns = any, Args... = ...any> = types.ClientAsync<Args..., (Returns)>
 
