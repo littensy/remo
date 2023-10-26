@@ -28,7 +28,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 	local function fire(self: any, player, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
 		instance:FireClient(player, ...)
-		test:_fire(...)
+		test:_fire(player, ...) -- do not risk omitting first argument
 	end
 
 	local function fireAll(self, ...)

@@ -179,7 +179,7 @@ return function()
 			return "result"
 		end)
 
-		expect(asyncRemote:request(player, "test", 1):expect()).to.equal("result")
+		expect(asyncRemote:request("test", 1):expect()).to.equal("result")
 		expect(arg1).to.equal("test")
 		expect(arg2).to.equal(1)
 

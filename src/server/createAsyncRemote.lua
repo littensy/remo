@@ -27,7 +27,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 
 		return Promise.try(function(...)
 			local response = if test:hasRequestHandler()
-				then table.pack(test:_request(...)) :: never
+				then table.pack(test:_request(player, ...)) :: never
 				else table.pack(instance:InvokeClient(player, ...))
 
 			for index, validator in builder.metadata.returns do
