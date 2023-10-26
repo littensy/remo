@@ -3,7 +3,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remo = require(ReplicatedStorage.Packages.Remo)
 local t = require(ReplicatedStorage.Packages.t)
 
--- stylua: ignore
 type Remotes = Remo.Remotes<{
 	addTodo: Remo.ClientToServer<string>,
 	removeTodo: Remo.ClientToServer<string>,
