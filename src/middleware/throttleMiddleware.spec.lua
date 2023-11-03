@@ -24,12 +24,12 @@ return function()
 	end
 
 	describe("event throttle", function()
-		local remotes, remote: types.ClientToServer, instance: RemoteEvent
+		local remotes, remote: types.ClientToServer, instance: BaseRemoteEvent
 
 		local function create(options: throttleMiddleware.ThrottleMiddlewareOptions)
 			remotes = createRemotes({ remote = builder.remote() }, throttleMiddleware(options))
 			remote = remotes.remote
-			instance = instances.createRemoteEvent("remote")
+			instance = instances.createRemoteEvent("remote", false)
 		end
 
 		afterEach(function()

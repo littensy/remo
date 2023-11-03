@@ -13,12 +13,14 @@ export type RemoteBuilder = {
 	metadata: RemoteBuilderMetadata,
 	returns: (...Validator) -> RemoteBuilder,
 	middleware: (...Middleware) -> RemoteBuilder,
+	unreliable: () -> RemoteBuilder,
 }
 
 export type RemoteBuilderMetadata = {
 	parameters: { Validator },
 	returns: { Validator },
 	middleware: { Middleware },
+	unreliable: boolean,
 }
 
 export type RemoteNamespace = {
