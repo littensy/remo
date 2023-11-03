@@ -239,6 +239,11 @@ declare namespace Remo {
 		 * through a namespace or the `createRemotes` function.
 		 */
 		readonly middleware: (...middleware: RemoteMiddleware[]) => RemoteBuilder<Signature, Mode>;
+		/**
+		 * Marks the remote as an unreliable remote. Uses an `UnreliableRemoteEvent`
+		 * internally if the remote is an event.
+		 */
+		readonly unreliable: () => RemoteBuilder<Signature, Mode>;
 	}
 
 	/**
