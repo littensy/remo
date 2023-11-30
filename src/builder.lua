@@ -7,6 +7,7 @@ local function remote(...: types.Validator): types.RemoteBuilder
 		parameters = { ... },
 		returns = {},
 		middleware = {},
+		unreliable = false,
 	}
 
 	local function returns(...)
@@ -22,11 +23,17 @@ local function remote(...: types.Validator): types.RemoteBuilder
 		return builder
 	end
 
+	local function unreliable()
+		metadata.unreliable = true
+		return builder
+	end
+
 	builder = {
 		type = "event",
 		metadata = metadata,
 		returns = returns,
 		middleware = middleware,
+		unreliable = unreliable,
 	}
 
 	return builder

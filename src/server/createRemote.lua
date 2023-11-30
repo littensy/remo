@@ -6,7 +6,7 @@ local instances = require(script.Parent.Parent.utils.instances)
 local testRemote = require(script.Parent.Parent.utils.testRemote)
 
 local function createRemote(name: string, builder: types.RemoteBuilder): types.Remote
-	local instance = instances.createRemoteEvent(name)
+	local instance = instances.createRemoteEvent(name, builder.metadata.unreliable)
 	local test = testRemote.createTestRemote()
 	local connected = true
 

@@ -239,6 +239,13 @@ declare namespace Remo {
 		 * through a namespace or the `createRemotes` function.
 		 */
 		readonly middleware: (...middleware: RemoteMiddleware[]) => RemoteBuilder<Signature, Mode>;
+		/**
+		 * Marks the remote as an unreliable remote. Uses an `UnreliableRemoteEvent`
+		 * internally if the remote is an event.
+		 *
+		 * @see https://devforum.roblox.com/t/introducing-unreliableremoteevents/2724155
+		 */
+		readonly unreliable: () => RemoteBuilder<Signature, Mode>;
 	}
 
 	/**

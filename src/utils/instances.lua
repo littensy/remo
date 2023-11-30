@@ -48,7 +48,7 @@ local function createRemoteFunction(name: string): RemoteFunction
 	return remoteFunction
 end
 
-local function createRemoteEvent(name: string): RemoteEvent
+local function createRemoteEvent(name: string, unreliable: boolean): RemoteEvent
 	if container:FindFirstChild(name) then
 		return container[name]
 	end
@@ -57,11 +57,11 @@ local function createRemoteEvent(name: string): RemoteEvent
 		return mockRemotes.createMockRemoteEvent(name)
 	end
 
-	local remoteEvent = Instance.new("RemoteEvent")
+	local remoteEvent = Instance.new(if unreliable then "UnreliableRemoteEvent" else "RemoteEvent")
 	remoteEvent.Name = name
 	remoteEvent.Parent = container
 
-	return remoteEvent
+	return remoteEvent :: RemoteEvent
 end
 
 return {

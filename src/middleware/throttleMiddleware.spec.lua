@@ -29,7 +29,7 @@ return function()
 		local function create(options: throttleMiddleware.ThrottleMiddlewareOptions)
 			remotes = createRemotes({ remote = builder.remote() }, throttleMiddleware(options))
 			remote = remotes.remote
-			instance = instances.createRemoteEvent("remote")
+			instance = instances.createRemoteEvent("remote", false)
 		end
 
 		afterEach(function()
