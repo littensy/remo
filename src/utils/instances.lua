@@ -48,7 +48,7 @@ local function createRemoteFunction(name: string): RemoteFunction
 	return remoteFunction
 end
 
-local function createRemoteEvent(name: string, unreliable: boolean): BaseRemoteEvent
+local function createRemoteEvent(name: string, unreliable: boolean): RemoteEvent
 	if container:FindFirstChild(name) then
 		return container[name]
 	end
@@ -61,7 +61,7 @@ local function createRemoteEvent(name: string, unreliable: boolean): BaseRemoteE
 	remoteEvent.Name = name
 	remoteEvent.Parent = container
 
-	return remoteEvent
+	return remoteEvent :: RemoteEvent
 end
 
 return {
