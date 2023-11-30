@@ -1,3 +1,4 @@
 {
-	"className": "Configuration"
+	"className": "Configuration",
+	"ignoreUnknownInstances": true
 }
