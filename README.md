@@ -383,6 +383,8 @@ function remote<Mode, Args>(...validators: Validator[]): RemoteBuilder;
 
 - `remote.middleware(...middleware)` - Applies the given middleware to this remote.
 
+- `remote.unreliable()` - Marks this remote as an [unreliable remote event](https://devforum.roblox.com/t/introducing-unreliableremoteevents/2724155).
+
 ---
 
 ### `namespace(schema)`
