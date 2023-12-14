@@ -22,6 +22,10 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 
 		local arguments = table.pack(...)
 
+		for index, validator in builder.metadata.parameters do
+			assert(validator(arguments[index]), `Invalid parameter #{index} for remote '{name}': got {value}`)
+		end
+
 		return instances.promiseRemoteFunction(name):andThen(function(instance)
 			local response = if test:hasRequestHandler()
 				then table.pack(test:_request(table.unpack(arguments, 1, arguments.n))) :: never

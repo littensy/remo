@@ -25,20 +25,30 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		end
 	end
 
+	local function runMiddleware(...)
+		for index, validator in builder.metadata.parameters do
+			local value = select(index, ...)
+			assert(validator(value), `Invalid parameter #{index} for event remote '{name}': got {value}`)
+		end
+	end
+
 	local function fire(self: any, player, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
+		runMiddleware(...)
 		instance:FireClient(player, ...)
 		test:_fire(player, ...) -- do not risk omitting first argument
 	end
 
 	local function fireAll(self, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
+		runMiddleware(...)
 		instance:FireAllClients(...)
 		test:_fire(...)
 	end
 
 	local function fireAllExcept(self, exception, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
+		runMiddleware(...)
 		for _, player in Players:GetPlayers() do
 			if player ~= exception then
 				instance:FireClient(player, ...)
@@ -49,6 +59,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 
 	local function firePlayers(self, players, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
+		runMiddleware(...)
 		for _, player in players do
 			instance:FireClient(player, ...)
 		end
@@ -87,11 +98,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 	end, remote)
 
 	instance.OnServerEvent:Connect(function(player: Player, ...)
-		for index, validator in builder.metadata.parameters do
-			local value = select(index, ...)
-			assert(validator(value), `Invalid parameter #{index} for event remote '{name}': got {value}`)
-		end
-
+		runMiddleware(...)
 		emit(player, ...)
 	end)
 
