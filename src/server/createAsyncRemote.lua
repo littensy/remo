@@ -25,6 +25,11 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 	local function request(self, player, ...)
 		assert(connected, `Cannot use destroyed async remote '{name}'`)
 
+		for index, validator in builder.metadata.parameters do
+			local value = select(index, ...)
+			assert(validator(value), `Invalid parameter #{index} for async remote '{name}': got {value}`)
+		end
+
 		return Promise.try(function(...)
 			local response = if test:hasRequestHandler()
 				then table.pack(test:_request(player, ...)) :: never

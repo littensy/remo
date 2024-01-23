@@ -32,6 +32,10 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 
 		local arguments = table.pack(...)
 
+		for index, validator in builder.metadata.parameters do
+			assert(validator(arguments[index]), `Invalid parameter #{index} for remote '{name}': got {value}`)
+		end
+
 		instances.promiseRemoteEvent(name):andThen(function(instance)
 			instance:FireServer(table.unpack(arguments, 1, arguments.n))
 			test:_fire(table.unpack(arguments, 1, arguments.n))
