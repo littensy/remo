@@ -74,7 +74,7 @@ pnpm add @rbxts/remo
 
 ```toml
 [dependencies]
-Remo = "littensy/remo@1.3.1"
+Remo = "littensy/remo@1.4.0"
 ```
 
 ---
