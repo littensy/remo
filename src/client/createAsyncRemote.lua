@@ -7,17 +7,20 @@ local testRemote = require(script.Parent.Parent.utils.testRemote)
 local function createAsyncRemote(name: string, builder: types.RemoteBuilder): types.AsyncRemote
 	local test = testRemote.createTestAsyncRemote()
 	local connected = true
+	local handler = function(...) end
 
-	local function handler(...): any
-		return
-	end
+	local self = {
+		name = name,
+		type = "function" :: "function",
+		test = test,
+	} :: types.AsyncRemote
 
-	local function onRequest(self, callback)
+	function self:onRequest(callback)
 		assert(connected, `Cannot use destroyed async remote '{name}'`)
 		handler = callback
 	end
 
-	local function request(self, ...)
+	function self:request(...)
 		assert(connected, `Cannot use destroyed async remote '{name}'`)
 
 		local arguments = table.pack(...)
@@ -38,29 +41,16 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		end) :: any
 	end
 
-	local function destroy()
+	function self:destroy()
 		if connected then
 			connected = false
 			function handler() end
 		end
 	end
 
-	local api: types.AsyncRemoteApi = {
-		name = name,
-		type = "function" :: "function",
-		test = test,
-		onRequest = onRequest,
-		request = request,
-		destroy = destroy,
-	}
-
-	local asyncRemote = setmetatable(api, {
-		__call = request,
-	}) :: types.AsyncRemote
-
 	local invoke = compose(builder.metadata.middleware)(function(...)
 		return unwrap(handler(...))
-	end, asyncRemote)
+	end, self)
 
 	instances.promiseRemoteFunction(name):andThen(function(instance): ()
 		if not connected then
@@ -81,7 +71,11 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		warn(`Failed to initialize async remote '{name}': {error}`)
 	end)
 
-	return asyncRemote
+	setmetatable(self :: {}, {
+		__call = self.request,
+	})
+
+	return self
 end
 
 return createAsyncRemote

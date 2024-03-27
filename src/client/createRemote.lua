@@ -15,7 +15,16 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		error(`Attempted to use a server-only function on the client remote '{name}'`)
 	end
 
-	local function connect(self: any, listener)
+	local self = {
+		name = name,
+		type = "event" :: "event",
+		test = test,
+		fireAll = noop,
+		fireAllExcept = noop,
+		firePlayers = noop,
+	} :: types.Remote
+
+	function self:connect(listener)
 		assert(connected, `Cannot use destroyed remote '{name}'`)
 
 		local id = nextListenerId
@@ -27,7 +36,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		end
 	end
 
-	local function fire(self: any, ...)
+	function self:fire(...)
 		assert(connected, `Cannot use destroyed remote '{name}'`)
 
 		local arguments = table.pack(...)
@@ -40,7 +49,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		end)
 	end
 
-	local function destroy()
+	function self:destroy()
 		if not connected then
 			return
 		end
@@ -55,23 +64,11 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		table.clear(listeners)
 	end
 
-	local remote: types.Remote = {
-		name = name,
-		type = "event" :: "event",
-		test = test,
-		connect = connect,
-		fire = fire,
-		fireAll = noop,
-		fireAllExcept = noop,
-		firePlayers = noop,
-		destroy = destroy,
-	}
-
 	local emit = compose(builder.metadata.middleware)(function(...): ()
 		for _, listener in listeners do
 			task.spawn(listener, ...)
 		end
-	end, remote)
+	end, self)
 
 	instances.promiseRemoteEvent(name):andThen(function(instance)
 		if not connected then
@@ -90,7 +87,11 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		warn(`Failed to initialize remote '{name}': {error}`)
 	end)
 
-	return remote
+	setmetatable(self :: {}, {
+		__call = self.fire,
+	})
+
+	return self
 end
 
 return createRemote

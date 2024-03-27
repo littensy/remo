@@ -36,8 +36,6 @@ export type RemoteType = "event" | "function"
 
 export type AnyRemote = Remote | AsyncRemote
 
-export type Remote<Args... = ...any> = ClientToServer<Args...> & ServerToClient<Args...>
-
 export type Remotes<Map = RemoteMap> = Map & {
 	destroy: (self: Remotes<Map>) -> (),
 }
@@ -46,7 +44,9 @@ export type RemoteMap = {
 	[string]: AnyRemote | RemoteMap,
 }
 
-export type ClientToServer<Args... = ...any> = {
+export type Remote<Args... = ...any> = ClientToServer<Args...> & ServerToClient<Args...>
+
+export type ClientToServer<Args... = ...any> = ((Args...) -> ()) & {
 	name: string,
 	type: "event",
 	test: TestRemote<Args...>,
@@ -55,7 +55,7 @@ export type ClientToServer<Args... = ...any> = {
 	destroy: (self: ClientToServer<Args...>) -> (),
 }
 
-export type ServerToClient<Args... = ...any> = {
+export type ServerToClient<Args... = ...any> = ((player: Player, Args...) -> ()) & {
 	name: string,
 	type: "event",
 	test: TestRemote<Args...>,
@@ -71,40 +71,28 @@ export type AsyncRemote<Args... = ...any, Returns... = ...any> =
 	ServerAsync<Args..., Returns...>
 	& ClientAsync<Args..., Returns...>
 
-export type ServerAsync<Args... = ...any, Returns... = ...any> =
-	((Args...) -> Promise<Returns...>)
-	& ServerAsyncApi<Args..., Returns...>
-
-export type ClientAsync<Args... = ...any, Returns... = ...any> =
-	((player: Player, Args...) -> Promise<Returns...>)
-	& ClientAsyncApi<Args..., Returns...>
-
-export type AsyncRemoteApi<Args... = ...any, Returns... = ...any> =
-	ServerAsyncApi<Args..., Returns...>
-	& ClientAsyncApi<Args..., Returns...>
-
-export type ServerAsyncApi<Args..., Returns...> = {
+export type ServerAsync<Args... = ...any, Returns... = ...any> = ((Args...) -> Promise<Returns...>) & {
 	name: string,
 	type: "function",
 	test: TestAsyncRemote<Args..., Returns...>,
 	onRequest: (
-		self: ServerAsyncApi<Args..., Returns...>,
+		self: ServerAsync<Args..., Returns...>,
 		callback: ((player: Player, Args...) -> Returns...) | (player: Player, Args...) -> Promise<Returns...>
 	) -> (),
-	request: (self: ServerAsyncApi<Args..., Returns...>, Args...) -> Promise<Returns...>,
-	destroy: (self: ServerAsyncApi<Args..., Returns...>) -> (),
+	request: (self: ServerAsync<Args..., Returns...>, Args...) -> Promise<Returns...>,
+	destroy: (self: ServerAsync<Args..., Returns...>) -> (),
 }
 
-export type ClientAsyncApi<Args..., Returns...> = {
+export type ClientAsync<Args... = ...any, Returns... = ...any> = ((player: Player, Args...) -> Promise<Returns...>) & {
 	name: string,
 	type: "function",
 	test: TestAsyncRemote<Args..., Returns...>,
 	onRequest: (
-		self: ClientAsyncApi<Args..., Returns...>,
+		self: ClientAsync<Args..., Returns...>,
 		callback: ((Args...) -> Returns...) | (Args...) -> Promise<Returns...>
 	) -> (),
-	request: (self: ClientAsyncApi<Args..., Returns...>, Args...) -> Promise<Returns...>,
-	destroy: (self: ClientAsyncApi<Args..., Returns...>) -> (),
+	request: (self: ClientAsync<Args..., Returns...>, Args...) -> Promise<Returns...>,
+	destroy: (self: ClientAsync<Args..., Returns...>) -> (),
 }
 
 export type TestRemote<Args... = ...any> = {

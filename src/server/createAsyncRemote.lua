@@ -12,17 +12,20 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 	local instance = instances.createRemoteFunction(name)
 	local test = testRemote.createTestAsyncRemote()
 	local connected = true
+	local handler = function(...) end
 
-	local function handler(...): ...any
-		return
-	end
+	local self = {
+		name = name,
+		type = "function" :: "function",
+		test = test,
+	} :: types.AsyncRemote
 
-	local function onRequest(self, callback)
+	function self:onRequest(callback)
 		assert(connected, `Cannot use destroyed async remote '{name}'`)
 		handler = callback
 	end
 
-	local function request(self, player, ...)
+	function self:request(player, ...)
 		assert(connected, `Cannot use destroyed async remote '{name}'`)
 
 		return Promise.try(function(...)
@@ -39,7 +42,7 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		end, ...)
 	end
 
-	local function destroy()
+	function self:destroy()
 		if connected then
 			connected = false
 			instance:Destroy()
@@ -47,22 +50,9 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		end
 	end
 
-	local api: types.AsyncRemoteApi = {
-		name = name,
-		type = "function" :: "function",
-		test = test,
-		onRequest = onRequest,
-		request = request,
-		destroy = destroy,
-	}
-
-	local asyncRemote = setmetatable(api, {
-		__call = request,
-	}) :: types.AsyncRemote
-
 	local invoke = compose(builder.metadata.middleware)(function(...)
 		return unwrap(handler(...))
-	end, asyncRemote)
+	end, self)
 
 	function instance.OnServerInvoke(player: Player, ...)
 		for index, validator in builder.metadata.parameters do
@@ -73,7 +63,11 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 		return invoke(player, ...)
 	end
 
-	return asyncRemote
+	setmetatable(self :: {}, {
+		__call = self.request,
+	})
+
+	return self
 end
 
 return createAsyncRemote
