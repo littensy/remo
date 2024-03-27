@@ -13,7 +13,13 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 	local listeners: { (...any) -> () } = {}
 	local nextListenerId = 0
 
-	local function connect(self: any, listener)
+	local self = {
+		name = name,
+		type = "event" :: "event",
+		test = test,
+	} :: types.Remote
+
+	function self:connect(listener)
 		assert(connected, `Cannot connect to destroyed event remote '{name}'`)
 
 		local id = nextListenerId
@@ -25,19 +31,19 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		end
 	end
 
-	local function fire(self: any, player, ...)
+	function self:fire(player, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
 		instance:FireClient(player, ...)
 		test:_fire(player, ...) -- do not risk omitting first argument
 	end
 
-	local function fireAll(self, ...)
+	function self:fireAll(...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
 		instance:FireAllClients(...)
 		test:_fire(...)
 	end
 
-	local function fireAllExcept(self, exception, ...)
+	function self:fireAllExcept(exception, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
 		for _, player in Players:GetPlayers() do
 			if player ~= exception then
@@ -47,7 +53,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		test:_fire(...)
 	end
 
-	local function firePlayers(self, players, ...)
+	function self:firePlayers(players, ...)
 		assert(connected, `Cannot fire destroyed event remote '{name}'`)
 		for _, player in players do
 			instance:FireClient(player, ...)
@@ -55,7 +61,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		test:_fire(...)
 	end
 
-	local function destroy()
+	function self:destroy()
 		if not connected then
 			return
 		end
@@ -68,23 +74,11 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		table.clear(listeners)
 	end
 
-	local remote: types.Remote = {
-		name = name,
-		type = "event" :: "event",
-		test = test,
-		connect = connect,
-		fire = fire,
-		fireAll = fireAll,
-		fireAllExcept = fireAllExcept,
-		firePlayers = firePlayers,
-		destroy = destroy,
-	}
-
 	local emit = compose(builder.metadata.middleware)(function(...): ()
 		for _, listener in listeners do
 			task.spawn(listener, ...)
 		end
-	end, remote)
+	end, self)
 
 	instance.OnServerEvent:Connect(function(player: Player, ...)
 		for index, validator in builder.metadata.parameters do
@@ -95,7 +89,11 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		emit(player, ...)
 	end)
 
-	return remote
+	setmetatable(self :: {}, {
+		__call = self.fire,
+	})
+
+	return self
 end
 
 return createRemote

@@ -1,8 +1,6 @@
 local types = require(script.Parent.types)
 
 local function remote(...: types.Validator): types.RemoteBuilder
-	local builder: types.RemoteBuilder
-
 	local metadata: types.RemoteBuilderMetadata = {
 		parameters = { ... },
 		returns = {},
@@ -10,33 +8,30 @@ local function remote(...: types.Validator): types.RemoteBuilder
 		unreliable = false,
 	}
 
-	local function returns(...)
-		builder.type = "function"
+	local self = {
+		type = "event",
+		metadata = metadata,
+	} :: types.RemoteBuilder
+
+	function self.returns(...)
+		self.type = "function"
 		metadata.returns = { ... }
-		return builder
+		return self
 	end
 
-	local function middleware(...)
+	function self.middleware(...)
 		for index = 1, select("#", ...) do
 			table.insert(metadata.middleware, (select(index, ...)))
 		end
-		return builder
+		return self
 	end
 
-	local function unreliable()
+	function self.unreliable()
 		metadata.unreliable = true
-		return builder
+		return self
 	end
 
-	builder = {
-		type = "event",
-		metadata = metadata,
-		returns = returns,
-		middleware = middleware,
-		unreliable = unreliable,
-	}
-
-	return builder
+	return self
 end
 
 local function namespace(remotes: types.RemoteBuilders): types.RemoteNamespace

@@ -135,4 +135,16 @@ return function()
 		expect(arg1).to.equal("test")
 		expect(arg2).to.equal(1)
 	end)
+
+	it("should be callable", function()
+		local a, b
+
+		instance.OnClientEvent:Connect(function(...)
+			a, b = ...
+		end)
+
+		remote({}, "test", 1)
+		expect(a).to.equal("test")
+		expect(b).to.equal(1)
+	end)
 end

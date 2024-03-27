@@ -14,6 +14,8 @@ local function deepApplyMiddleware(builders: types.RemoteBuilders, ...: types.Mi
 end
 
 local function createRemotes<Map>(builders: types.RemoteBuilders, ...: types.Middleware): types.Remotes<Map>
+	local self = {} :: types.Remotes<Map>
+
 	deepApplyMiddleware(builders, ...)
 
 	local map = if constants.IS_SERVER then server.createRemotes(builders) else client.createRemotes(builders)
@@ -32,17 +34,15 @@ local function createRemotes<Map>(builders: types.RemoteBuilders, ...: types.Mid
 		end
 	end
 
-	local remotes: any = {
-		destroy = function()
-			recursiveDestroy(map)
-		end,
-	}
-
-	for key, value in map do
-		remotes[key] = value
+	function self:destroy()
+		recursiveDestroy(map)
 	end
 
-	return remotes
+	for key, value in map do
+		(self :: {})[key] = value
+	end
+
+	return self
 end
 
 return createRemotes
