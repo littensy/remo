@@ -51,6 +51,7 @@ export type ClientToServer<Args... = ...any> = ((Args...) -> ()) & {
 	type: "event",
 	test: TestRemote<Args...>,
 	connect: (self: ClientToServer<Args...>, callback: (player: Player, Args...) -> ()) -> Cleanup,
+	promise: (self: ClientToServer<Args...>, predicate: ((player: Player, Args...) -> boolean)?) -> Promise<Args...>,
 	fire: (self: ClientToServer<Args...>, Args...) -> (),
 	destroy: (self: ClientToServer<Args...>) -> (),
 }
@@ -60,6 +61,7 @@ export type ServerToClient<Args... = ...any> = ((player: Player, Args...) -> ())
 	type: "event",
 	test: TestRemote<Args...>,
 	connect: (self: ServerToClient<Args...>, callback: (Args...) -> ()) -> Cleanup,
+	promise: (self: ServerToClient<Args...>, predicate: ((Args...) -> boolean)?) -> Promise<Args...>,
 	fire: (self: ServerToClient<Args...>, player: Player, Args...) -> (),
 	firePlayers: (self: ServerToClient<Args...>, players: { Player }, Args...) -> (),
 	fireAll: (self: ServerToClient<Args...>, Args...) -> (),

@@ -1,6 +1,8 @@
 local Players = game:GetService("Players")
 
+local Promise = require(script.Parent.Parent.Promise)
 local types = require(script.Parent.Parent.types)
+
 local compose = require(script.Parent.Parent.utils.compose)
 local instances = require(script.Parent.Parent.utils.instances)
 local testRemote = require(script.Parent.Parent.utils.testRemote)
@@ -29,6 +31,22 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		return function()
 			listeners[id] = nil
 		end
+	end
+
+	function self:promise(predicate)
+		assert(connected, `Cannot promise destroyed event remote '{name}'`)
+
+		return Promise.new(function(resolve, _, onCancel)
+			local disconnect
+			disconnect = self:connect(function(...)
+				if not predicate or predicate(...) then
+					disconnect()
+					resolve(...)
+				end
+			end)
+
+			onCancel(disconnect)
+		end)
 	end
 
 	function self:fire(player, ...)

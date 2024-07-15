@@ -147,4 +147,42 @@ return function()
 		expect(a).to.equal("test")
 		expect(b).to.equal(1)
 	end)
+
+	it("should promise an event", function()
+		local player, a, b
+
+		remote:promise():andThen(function(...)
+			player, a, b = ...
+		end)
+
+		instance:FireServer("test", 1)
+
+		expect(player).to.be.ok()
+		expect(a).to.equal("test")
+		expect(b).to.equal(1)
+	end)
+
+	it("should promise a predicated event", function()
+		local player, a, b
+
+		remote
+			:promise(function(_, a)
+				return a == "true"
+			end)
+			:andThen(function(...)
+				player, a, b = ...
+			end)
+
+		instance:FireServer("false", 2)
+
+		expect(player).to.never.be.ok()
+		expect(a).to.never.be.ok()
+		expect(b).to.never.be.ok()
+
+		instance:FireServer("true", 1)
+
+		expect(player).to.be.ok()
+		expect(a).to.equal("true")
+		expect(b).to.equal(1)
+	end)
 end

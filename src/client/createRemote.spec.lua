@@ -151,4 +151,39 @@ return function()
 		expect(a).to.equal("test")
 		expect(b).to.equal(1)
 	end)
+
+	it("should promise an event", function()
+		local a, b
+
+		remote:promise():andThen(function(...)
+			a, b = ...
+		end)
+
+		instance:FireAllClients("test", 1)
+
+		expect(a).to.equal("test")
+		expect(b).to.equal(1)
+	end)
+
+	it("should promise a predicated event", function()
+		local a, b
+
+		remote
+			:promise(function(a)
+				return a == "true"
+			end)
+			:andThen(function(...)
+				a, b = ...
+			end)
+
+		instance:FireAllClients("false", 2)
+
+		expect(a).to.never.be.ok()
+		expect(b).to.never.be.ok()
+
+		instance:FireAllClients("true", 1)
+
+		expect(a).to.equal("true")
+		expect(b).to.equal(1)
+	end)
 end
