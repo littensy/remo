@@ -340,6 +340,31 @@ declare namespace Remo {
 		 * @client
 		 */
 		connect(listener: (...args: Args) => void): Cleanup;
+		/**
+		 * Returns a Promise that resolves when the remote is fired by a player.
+		 * If `predicate` is provided, the Promise will only resolve if the
+		 * predicate returns true.
+		 *
+		 * NOTE: Promises in Roblox-TS do not support tuples. Use the `mapper`
+		 * argument to map the tuple to a consumable value.
+		 *
+		 * @server
+		 */
+		promise<T = Player>(
+			predicate?: (player: Player, ...args: Args) => boolean,
+			mapper?: (player: Player, ...args: Args) => T,
+		): Promise<T>;
+		/**
+		 * Returns a Promise that resolves when the remote is fired by the server.
+		 * If `predicate` is provided, the Promise will only resolve if the
+		 * predicate returns true.
+		 *
+		 * NOTE: Promises in Roblox-TS do not support tuples. Use the `mapper`
+		 * argument to map the tuple to a consumable value.
+		 *
+		 * @client
+		 */
+		promise<T = Args[0]>(predicate?: (...args: Args) => boolean, mapper?: (...args: Args) => T): Promise<T>;
 	}
 
 	/**
@@ -381,6 +406,20 @@ declare namespace Remo {
 		 * @server
 		 */
 		connect(listener: (player: Player, ...args: Args) => void): Cleanup;
+		/**
+		 * Returns a Promise that resolves when the remote is fired by a player.
+		 * If `predicate` is provided, the Promise will only resolve if the
+		 * predicate returns true.
+		 *
+		 * NOTE: Promises in Roblox-TS do not support tuples. Use the `mapper`
+		 * argument to map the tuple to a consumable value.
+		 *
+		 * @server
+		 */
+		promise<T = Player>(
+			predicate?: (player: Player, ...args: Args) => boolean,
+			mapper?: (player: Player, ...args: Args) => T,
+		): Promise<T>;
 	}
 
 	/**
@@ -449,6 +488,17 @@ declare namespace Remo {
 		 * @client
 		 */
 		connect(listener: (...args: Args) => void): Cleanup;
+		/**
+		 * Returns a Promise that resolves when the remote is fired by the server.
+		 * If `predicate` is provided, the Promise will only resolve if the
+		 * predicate returns true.
+		 *
+		 * NOTE: Promises in Roblox-TS do not support tuples. Use the `mapper`
+		 * argument to map the tuple to a consumable value.
+		 *
+		 * @client
+		 */
+		promise<T = Args[0]>(predicate?: (...args: Args) => boolean, mapper?: (...args: Args) => T): Promise<T>;
 	}
 
 	/**

@@ -33,7 +33,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		end
 	end
 
-	function self:promise(predicate)
+	function self:promise(predicate, mapper)
 		assert(connected, `Cannot promise destroyed event remote '{name}'`)
 
 		return Promise.new(function(resolve, _, onCancel)
@@ -41,7 +41,11 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 			disconnect = self:connect(function(...)
 				if not predicate or predicate(...) then
 					disconnect()
-					resolve(...)
+					if mapper then
+						resolve(mapper(...))
+					else
+						resolve(...)
+					end
 				end
 			end)
 

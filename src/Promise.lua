@@ -14,12 +14,12 @@ export type PromiseConstructor = {
 		Rejected: "Rejected",
 		Cancelled: "Cancelled",
 	},
-	new: <T>(
-		resolver: (resolve: (T | Promise<T>) -> (), reject: (any) -> (), onCancel: (abortHandler: () -> ()) -> ()) -> ()
-	) -> Promise<T>,
-	defer: <T>(
-		resolver: (resolve: (T | Promise<T>) -> (), reject: (any) -> (), onCancel: (abortHandler: () -> ()) -> ()) -> ()
-	) -> Promise<T>,
+	new: <T...>(
+		resolver: (resolve: (T...) -> (), reject: (any) -> (), onCancel: (abortHandler: () -> ()) -> ()) -> ()
+	) -> Promise<T...>,
+	defer: <T...>(
+		resolver: (resolve: (T...) -> (), reject: (any) -> (), onCancel: (abortHandler: () -> ()) -> ()) -> ()
+	) -> Promise<T...>,
 	resolve: <T>(value: T | Promise<T>, ...any) -> Promise<T>,
 	reject: (value: any) -> Promise<never>,
 	try: <T, A...>(callback: (A...) -> T, A...) -> Promise<T>,
