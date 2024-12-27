@@ -3,6 +3,7 @@ local types = require(script.types)
 local createRemotes = require(script.createRemotes)
 local builder = require(script.builder)
 local getSender = require(script.getSender)
+local mockPlayer = require(script.mockPlayer)
 local loggerMiddleware = require(script.middleware.loggerMiddleware)
 local throttleMiddleware = require(script.middleware.throttleMiddleware)
 
@@ -40,4 +41,5 @@ return {
 	loggerMiddleware = loggerMiddleware,
 	throttleMiddleware = throttleMiddleware,
 	getSender = getSender,
+	mockPlayer = mockPlayer
 }

@@ -75,6 +75,13 @@ declare namespace Remo {
 	 */
 	export function getSender(...args: unknown[]): Player | undefined;
 
+	/**
+	 * Creates a mock player used for testing, only UserId is stored
+	 * currently, but you can pass other values though it may cause
+	 * unexpected behavior
+	 */
+	export function mockPlayer(player: Partial<Player>): Player;
+
 	interface ThrottleMiddlewareOptions {
 		/**
 		 * The number of seconds to wait before the remote can be invoked again.
