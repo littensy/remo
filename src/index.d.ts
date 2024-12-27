@@ -71,7 +71,8 @@ declare namespace Remo {
 
 	/**
 	 * Returns the player who invoked the remote given the first argument passed
-	 * to the remote.
+	 * to the remote. If the first argument is an instance or a table with a
+	 * `ClassName` property set to `"Player"`, it will be returned.
 	 */
 	export function getSender(...args: unknown[]): Player | undefined;
 

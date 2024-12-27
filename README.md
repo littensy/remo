@@ -407,9 +407,9 @@ function namespace(schema: RemoteSchema): RemoteNamespace;
 
 ### `getSender(...)`
 
-Returns the player that sent the remote invocation using the arguments passed to the remote.
+Returns the player that sent the remote invocation using the arguments passed to the remote. This checks whether the first argument is a table or an instance with a `ClassName` property equal to `"Player"`.
 
-This is used for finding the `player` argument from a middleware called on the server.
+This is used for finding the `player` argument in a middleware function on the server.
 
 ```ts
 function getSender(...args: unknown[]): Player | undefined;
