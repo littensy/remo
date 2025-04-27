@@ -12,6 +12,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 
 	local listeners: { (...any) -> () } = {}
 	local nextListenerId = 0
+	local queue = {}
 
 	local function noop()
 		error(`Attempted to use a server-only function on the client remote '{name}'`)
@@ -32,6 +33,13 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		local id = nextListenerId
 		nextListenerId += 1
 		listeners[id] = listener
+
+		if #queue > 0 then
+			for _, args in queue do
+				task.spawn(listener, table.unpack(args))
+			end
+			table.clear(queue)
+		end
 
 		return function()
 			listeners[id] = nil
@@ -84,11 +92,16 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 		end
 
 		table.clear(listeners)
+		table.clear(queue)
 	end
 
 	local emit = compose(builder.metadata.middleware)(function(...): ()
-		for _, listener in listeners do
-			task.spawn(listener, ...)
+		if next(listeners) then
+			for _, listener in listeners do
+				task.spawn(listener, ...)
+			end
+		else
+			table.insert(queue, table.pack(...))
 		end
 	end, self)
 
