@@ -1,6 +1,6 @@
 {
 	"name": "@rbxts/remo",
-	"version": "1.5.1",
+	"version": "1.5.2",
 	"description": "A simple remote library for Roblox",
 	"main": "src/init.luau",
 	"scripts": {
