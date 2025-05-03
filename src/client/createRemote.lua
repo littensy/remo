@@ -12,7 +12,7 @@ local function createRemote(name: string, builder: types.RemoteBuilder): types.R
 
 	local listeners: { (...any) -> () } = {}
 	local nextListenerId = 0
-	local queue = {}
+	local queue: { {any} } = {}
 
 	local function noop()
 		error(`Attempted to use a server-only function on the client remote '{name}'`)
