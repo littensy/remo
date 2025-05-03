@@ -14,7 +14,7 @@ export type ThrottleMiddlewareOptions = {
 	[any]: any,
 } | number
 
-local function timeout<T...>(callback: (T...) -> (), amount: number, ...: T...): () -> ()
+local function timeout<T...>(callback: (T...) -> (), amount: number): () -> ()
 	local timer = 0
 	local connection
 

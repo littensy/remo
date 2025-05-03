@@ -90,7 +90,7 @@ return function()
 
 			create({ throttle = 0, trailing = true })
 
-			remote:connect(function(player, a, b)
+			remote:connect(function(_, a, b)
 				calls += 1
 				arg1, arg2 = a, b
 			end)

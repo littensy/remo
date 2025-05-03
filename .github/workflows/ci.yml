@@ -14,9 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install Aftman
-        uses: ok-nick/setup-aftman@v0.4.2
+      - uses: CompeyDev/setup-rokit@v0.1.2
 
       - name: Install dependencies
         run: wally install
@@ -25,10 +23,10 @@ jobs:
         run: rojo sourcemap test.project.json -o sourcemap.json
 
       - name: Download global Roblox types
-        run: curl -o scripts/roblox.d.lua https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.lua  
+        run: curl -o scripts/roblox.d.luau https://raw.githubusercontent.com/JohnnyMorganz/luau-lsp/main/scripts/globalTypes.d.luau
 
       - name: Analyze
-        run: luau-lsp analyze --defs=scripts/testez.d.lua --defs=scripts/roblox.d.lua --base-luaurc=.luaurc --sourcemap=sourcemap.json --ignore="**/_Index/**" --no-strict-dm-types src
+        run: luau-lsp analyze --defs=scripts/testez.d.luau --defs=scripts/roblox.d.luau --base-luaurc=.luaurc --sourcemap=sourcemap.json --ignore="**/_Index/**" src
 
       - name: Check code quality
         run: |

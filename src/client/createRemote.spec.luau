@@ -95,7 +95,7 @@ return function()
 			"test",
 			builder.remote(t.string, t.number).middleware(function(next, remote)
 				middlewareRemote = remote
-				return function(...)
+				return function()
 					return next("intercepted", 2)
 				end
 			end)

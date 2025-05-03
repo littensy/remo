@@ -7,7 +7,7 @@ local function createTestRemote(): types.TestRemote
 	local listeners: { (...any) -> () } = {}
 	local nextListenerId = 0
 
-	local function fire(self, first, ...)
+	local function fire(_self, first, ...)
 		local shouldOmitPlayer = getSender(first)
 
 		for _, listener in listeners do
@@ -19,7 +19,7 @@ local function createTestRemote(): types.TestRemote
 		end
 	end
 
-	local function onFire(self, listener)
+	local function onFire(_self, listener)
 		local id = nextListenerId
 		nextListenerId += 1
 		listeners[id] = listener
@@ -29,7 +29,7 @@ local function createTestRemote(): types.TestRemote
 		end
 	end
 
-	local function disconnectAll(self)
+	local function disconnectAll(_self)
 		table.clear(listeners)
 	end
 
@@ -45,19 +45,19 @@ end
 local function createTestAsyncRemote(): types.TestAsyncRemote
 	local handler: (...any) -> () = noop
 
-	local function request(self, first, ...)
+	local function request(_self, first, ...)
 		return if getSender(first) then handler(...) else handler(first, ...)
 	end
 
-	local function handleRequest(self, newHandler)
+	local function handleRequest(_self, newHandler)
 		handler = newHandler
 	end
 
-	local function hasRequestHandler(self)
+	local function hasRequestHandler()
 		return handler ~= noop
 	end
 
-	local function disconnectAll(self)
+	local function disconnectAll()
 		handler = noop
 	end
 

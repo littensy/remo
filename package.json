@@ -2,7 +2,7 @@
 	"name": "@rbxts/remo",
 	"version": "1.5.1",
 	"description": "A simple remote library for Roblox",
-	"main": "src/init.lua",
+	"main": "src/init.luau",
 	"scripts": {
 		"test": "sh scripts/test.sh",
 		"analyze": "sh scripts/analyze.sh"
@@ -25,7 +25,7 @@
 	"files": [
 		"src",
 		"!**/*.tsbuildinfo",
-		"!**/*.spec.lua"
+		"!**/*.spec.luau"
 	],
 	"publishConfig": {
 		"access": "public"

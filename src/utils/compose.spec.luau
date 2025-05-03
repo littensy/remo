@@ -63,7 +63,7 @@ return function()
 			end
 		end
 
-		local composed = compose({ middleware, middleware, middleware })(function(...): (string, string, string)
+		local composed = compose({ middleware, middleware, middleware })(function(): (string, string, string)
 			return "foo", "bar", "baz"
 		end, {} :: never)
 

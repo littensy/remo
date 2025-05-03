@@ -41,7 +41,7 @@ local function createMockRemoteEvent(name: string): RemoteEvent
 		} :: never
 	end
 
-	function remoteEvent:FireClient(player: Player, ...)
+	function remoteEvent:FireClient(_player: Player, ...)
 		for callback in clientListeners do
 			callback(...)
 		end
@@ -81,12 +81,12 @@ local function createMockRemoteFunction(name: string): RemoteFunction
 		OnServerInvoke = function() end,
 	} :: any
 
-	function remoteFunction:InvokeClient(player: Player, ...)
+	function remoteFunction:InvokeClient(_player: Player, ...)
 		return self.OnClientInvoke(...)
 	end
 
 	function remoteFunction:InvokeServer(...)
-		return self.OnServerInvoke(Players.LocalPlayer or {}, ...)
+		return self.OnServerInvoke(Players.LocalPlayer or {} :: any, ...)
 	end
 
 	function remoteFunction:Destroy(): ()
