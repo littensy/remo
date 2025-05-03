@@ -276,16 +276,16 @@ Here's an example middleware function that logs the arguments and return value o
 
 ```ts
 // TypeScript
-const loggerMiddleware: RemoteMiddleware = (next, remote) => {
+const loggerMiddleware: RemoteMiddleware = (nextFn, remote) => {
 	return (...args: unknown[]) => {
 		if (remote.type === "event") {
 			print(`${remote.name} fired with arguments:`, ...args);
-			return next(...args);
+			return nextFn(...args);
 		}
 
 		print(`${remote.name} called with arguments:`, ...args);
 
-		const result = next(...args);
+		const result = nextFn(...args);
 
 		print(`${remote.name} returned:`, result);
 
