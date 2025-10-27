@@ -46,7 +46,11 @@ local function createTestAsyncRemote(): types.TestAsyncRemote
 	local handler: (...any) -> () = noop
 
 	local function request(_self, first, ...)
-		return if getSender(first) then handler(...) else handler(first, ...)
+		if getSender(first) then
+            return handler(...)
+        else
+            return handler(first, ...)
+        end
 	end
 
 	local function handleRequest(_self, newHandler)
