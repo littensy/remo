@@ -2,12 +2,12 @@ local Promise = require(script.Parent.Parent.Promise)
 
 type Promise<T> = Promise.Promise<T>
 
-local function unwrap<T>(...: Promise<T> | T): T
-	if Promise.is(...) then
-		return (... :: Promise<T>):expect()
+local function unwrap<T, U...>(promise: T | Promise<T>?, ...: U...): (T, U...)
+	if Promise.is(promise) then
+		return (promise :: Promise<T>):expect()
 	end
 
-	return (...) :: T
+	return promise :: T, ...
 end
 
 return unwrap
