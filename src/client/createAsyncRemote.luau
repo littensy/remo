@@ -49,7 +49,6 @@ local function createAsyncRemote(name: string, builder: types.RemoteBuilder): ty
 	end
 
 	local invoke = compose(builder.metadata.middleware)(function(...: any): any
-		handler(...)
 		return unwrap(handler(...))
 	end, self)
 
