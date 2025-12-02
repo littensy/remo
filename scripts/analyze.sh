@@ -4,4 +4,8 @@ rojo sourcemap test.project.json -o sourcemap.json
 
 luau-lsp analyze --defs=scripts/testez.d.luau --defs=scripts/roblox.d.luau --sourcemap=sourcemap.json --base-luaurc=.luaurc --ignore="**/_Index/**" src
 
+selene src
+
+stylua --check src
+
 rm scripts/roblox.d.luau

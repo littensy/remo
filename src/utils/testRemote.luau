@@ -47,10 +47,10 @@ local function createTestAsyncRemote(): types.TestAsyncRemote
 
 	local function request(_self, first, ...)
 		if getSender(first) then
-            return handler(...)
-        else
-            return handler(first, ...)
-        end
+			return handler(...)
+		else
+			return handler(first, ...)
+		end
 	end
 
 	local function handleRequest(_self, newHandler)
